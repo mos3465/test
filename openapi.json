@@ -88,13 +88,6 @@
             }
           }
         ],
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:internal"
-            ]
-          }
-        ],
         "responses": {
           "200": {
             "description": "Partnervorschläge für den Beleg.\n",
@@ -173,13 +166,6 @@
             }
           }
         ],
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:internal"
-            ]
-          }
-        ],
         "responses": {
           "200": {
             "description": "Der Beleg wurde erfolgreich hochgeladen und wird nun verarbeitet.<br>\n",
@@ -235,13 +221,6 @@
         ],
         "summary": "Anlegen eines Belegs",
         "operationId": "uploadBelegInternal",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:internal"
-            ]
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -373,13 +352,6 @@
           "beleg-content-internal"
         ],
         "operationId": "getBelegContentInternal",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:content:internal"
-            ]
-          }
-        ],
         "description": "Laden einer Datei über die UUID. Wenn der Beleg durch die Texterkennung verarbeitet wurde, so wird die daraus resultierende Datei geladen. Ansonsten wird die Originaldatei (ggf. ohne Text) geladen.",
         "responses": {
           "200": {
@@ -463,13 +435,6 @@
           "beleg-content-internal"
         ],
         "operationId": "getBelegContentOriginalInternal",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:content:internal"
-            ]
-          }
-        ],
         "description": "Laden der Originaldatei über die UUID",
         "responses": {
           "200": {
@@ -553,13 +518,6 @@
           "beleg-content-internal"
         ],
         "operationId": "getBelegContentEnhancedInternal",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:content:internal"
-            ]
-          }
-        ],
         "description": "Laden der aus der Texterkennung resultierenden Datei über die UUID.",
         "responses": {
           "200": {
@@ -632,13 +590,6 @@
         ],
         "summary": "Festschreiben eines Belegs",
         "operationId": "stipulateFakturierungsbeleg",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:fakturierung:beleg:internal"
-            ]
-          }
-        ],
         "description": "Legt zu einem Fakturierungsbeleg-Portal einen neuen Beleg mit den übergebenen Daten an.\nDieser Beleg wird dann direkt festgeschrieben.\n",
         "requestBody": {
           "required": true,
@@ -733,13 +684,6 @@
         ],
         "summary": "Stornieren eines Belegs",
         "operationId": "reverseFakturierungsbeleg",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:fakturierung:beleg:internal"
-            ]
-          }
-        ],
         "description": "Storniert den zu einem stornierten Fakturierungsbeleg-Portal gehörigen Beleg.\nLegt zu dem Korrektur-Fakturierungsbeleg-Portal mit den übergebenen Daten einen neuen Beleg an.\n",
         "requestBody": {
           "required": true,
@@ -838,13 +782,6 @@
           "inhaber"
         ],
         "operationId": "getInhabers",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:read"
-            ]
-          }
-        ],
         "parameters": [
           {
             "in": "query",
@@ -930,13 +867,6 @@
           "inhaber"
         ],
         "operationId": "getInhaber",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:read"
-            ]
-          }
-        ],
         "description": "Laden eines Inhabers zu einer UUID.\n",
         "responses": {
           "200": {
@@ -1020,13 +950,6 @@
         ],
         "summary": "Lesen der Belege",
         "operationId": "readBelege",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:read"
-            ]
-          }
-        ],
         "parameters": [
           {
             "in": "query",
@@ -1222,13 +1145,6 @@
         ],
         "summary": "Anlegen eines Belegs",
         "operationId": "createBeleg",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:create"
-            ]
-          }
-        ],
         "description": "Legt einen neuen Beleg an.\nEs ist möglich die Daten des Beleges auszulassen.\nDiese werden dann automatisch aus der Datei ermittelt und vorgeschlagen,\nmüssen später aber nachbearbeitet werden.\nEin Beleg ohne Datei ist nicht möglich.\nÜber die Importdaten können optional Informationen für den Import mitgegeben werden.\nEs kommt eine UUID für den Inhalt des Belegs zurück.\nÜber die Schnittstelle /importstatus/{inhaltId} kann sich der aktuelle Status des Imports abgerufen werden.\nDer Beleg ist angelegt, sobald der Importstatus eine BelegId enthält.\n",
         "requestBody": {
           "required": true,
@@ -1465,13 +1381,6 @@
         ],
         "summary": "Lesen der Anzahl der Belege",
         "operationId": "countBelege",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:read"
-            ]
-          }
-        ],
         "parameters": [
           {
             "in": "query",
@@ -1560,13 +1469,6 @@
         ],
         "summary": "Lesen der aktuellen Importe einer Firma",
         "operationId": "readImportStatus",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:create"
-            ]
-          }
-        ],
         "responses": {
           "200": {
             "description": "Importstatus geladen",
@@ -1673,13 +1575,6 @@
         ],
         "summary": "Lesen des aktuellen Importstatus eines Belegs",
         "operationId": "getImportStatus",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:create"
-            ]
-          }
-        ],
         "responses": {
           "200": {
             "description": "Importstatus geladen",
@@ -1774,13 +1669,6 @@
           "beleg"
         ],
         "operationId": "heften",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:update"
-            ]
-          }
-        ],
         "description": "Heftet mehrere einzelne Belege zu einem Beleg zusammen.\nDie Reihenfolge der Belege gibt die Reihenfolge der Seiten des neuen Belegs an.\nEigenbelege können nicht geheftet werden.\nHeften von Eigenbelegen wird mit einem Fehler beantwortet.\nÜber die API ist nicht erkennbar ob es sich bei einem Beleg um einen Eigenbeleg handelt.\n",
         "requestBody": {
           "required": true,
@@ -1948,13 +1836,6 @@
           "beleg"
         ],
         "operationId": "getBeleg",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:read"
-            ]
-          }
-        ],
         "description": "Laden eines Beleges zu der UUID.\n",
         "responses": {
           "200": {
@@ -2146,13 +2027,6 @@
           "beleg"
         ],
         "operationId": "updateBeleg",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:update"
-            ]
-          }
-        ],
         "description": "Aktualisieren der Metadaten zu einem Beleg.\nEigenbelege lassen keine Aktualisierung zu und sind nur über ADNOVA+ zu bearbeiten.\nAktualisieren von Eigenbelegen wird mit einem Fehler beantwortet.\nÜber die API ist nicht erkennbar ob es sich bei einem Beleg um einen Eigenbeleg handelt.\n",
         "requestBody": {
           "required": true,
@@ -2301,13 +2175,6 @@
           "beleg"
         ],
         "operationId": "deleteBeleg",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:delete"
-            ]
-          }
-        ],
         "description": "Löschen eines Belegs zu der UUID.\n",
         "responses": {
           "204": {
@@ -2400,13 +2267,6 @@
           "beleg"
         ],
         "operationId": "getBelegSuggestions",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:read"
-            ]
-          }
-        ],
         "description": "Laden von Vorschlagswerten zu einem Beleg.",
         "responses": {
           "200": {
@@ -2522,13 +2382,6 @@
           "beleg"
         ],
         "operationId": "getBelegContent",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:read"
-            ]
-          }
-        ],
         "description": "Laden einer Datei über die UUID. Wenn der Beleg durch die Texterkennung verarbeitet wurde, so wird die daraus resultierende Datei geladen. Ansonsten wird die Originaldatei (ggf. ohne Text) geladen.",
         "responses": {
           "200": {
@@ -2621,13 +2474,6 @@
           "beleg"
         ],
         "operationId": "getBelegContentOriginal",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:read"
-            ]
-          }
-        ],
         "description": "Laden der Originaldatei über die UUID",
         "responses": {
           "200": {
@@ -2721,13 +2567,6 @@
         ],
         "operationId": "getBelegContentOcr",
         "deprecated": true,
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:read"
-            ]
-          }
-        ],
         "description": "Laden der aus der Texterkennung resultierenden Datei über die UUID.",
         "responses": {
           "200": {
@@ -2820,13 +2659,6 @@
           "beleg"
         ],
         "operationId": "getBelegContentEnhanced",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:read"
-            ]
-          }
-        ],
         "description": "Laden der aus der Texterkennung resultierenden Datei über die UUID.",
         "responses": {
           "200": {
@@ -2919,13 +2751,6 @@
           "beleg"
         ],
         "operationId": "entheften",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:update"
-            ]
-          }
-        ],
         "description": "Entheftet einen mehrseitigen Beleg in einzelne Belege.\nDie neuen Belege werden neu importiert, damit die Vorschlagswerte ermittelt werden, daher kommen nur neue InhaltIds zurück.\nÜber die Schnittstelle /importstatus/{inhaltId} kann der aktuelle Status des enthefteten Belegs abgerufen werden.\nDer Beleg ist angelegt, sobald der Importstatus eine BelegId enthält.\n",
         "responses": {
           "200": {
@@ -3046,14 +2871,6 @@
           "beleg"
         ],
         "operationId": "moveBeleg",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:create",
-              "beon:beleg:delete"
-            ]
-          }
-        ],
         "description": "Verschiebt einen Beleg von einem Inhaber in einen anderen.\n",
         "responses": {
           "200": {
@@ -3149,13 +2966,6 @@
           "beleg"
         ],
         "operationId": "reverseBeleg",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:update"
-            ]
-          }
-        ],
         "description": "Storniert den Beleg und legt wenn createKorrekturBeleg=true einen Korrekturbeleg an.\nDie UUID des Korrekturbelegs wird zurückgegeben.\n",
         "requestBody": {
           "required": true,
@@ -3275,13 +3085,6 @@
           "beleg"
         ],
         "operationId": "stipulateBeleg",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:update"
-            ]
-          }
-        ],
         "description": "Schreibt einen Beleg fest.\nHierbei werden Status und Plfichtfelder Berücksichtigt.\nEs wird der Status auf 'festgeschrieben' geändert was den Beleg unveränderlich macht (GoBD).\nGleichzeitig wird dem Beleg eine je Inhaber(Betrieb) eindeutige Nummer zugewiesen.\nDiese muss unveränderlich, eindeutig und lückenlos sein.\nFestgeschrieben werden können Belege die den Status 'bearbeitet' haben\nund bei denen alle Pflichtfelder gefüllt sind.\n",
         "responses": {
           "200": {
@@ -3372,13 +3175,6 @@
           "beleg-aktionen"
         ],
         "operationId": "readBelegAktionen",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:read"
-            ]
-          }
-        ],
         "description": "Zu einem Beleg kann es Aktionen geben, die asynchron ausgeführt werden.\nDieser Endpunkt gibt die Aktionen für diesen Beleg aus.\n",
         "responses": {
           "200": {
@@ -3489,13 +3285,6 @@
         ],
         "summary": "Lesen der Erläuterungen",
         "operationId": "readErlaeuterungen",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "parameters": [
           {
             "in": "query",
@@ -3573,13 +3362,6 @@
         ],
         "summary": "Erstellen einer neuen Erläuterung",
         "operationId": "createErlaeuterung",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3705,13 +3487,6 @@
           "erlaeuterung"
         ],
         "operationId": "getErlaeuterung",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "description": "Laden einer Erläuterung über die Id",
         "responses": {
           "200": {
@@ -3788,13 +3563,6 @@
         ],
         "summary": "Aktualisieren einer Erläuterung",
         "operationId": "updateErlaeuterung",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "description": "Aktualisiert die Erläuterung",
         "requestBody": {
           "required": true,
@@ -3865,13 +3633,6 @@
         ],
         "summary": "Löschen einer Erläuterung",
         "operationId": "deleteErlaeuterung",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "responses": {
           "204": {
             "description": "Erläuterung gelöscht"
@@ -3939,13 +3700,6 @@
         ],
         "summary": "Lesen der FreitextPartner",
         "operationId": "readFreitextPartner",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "parameters": [
           {
             "in": "query",
@@ -4040,13 +3794,6 @@
         ],
         "summary": "Erstellen eines neuen FreitextPartners",
         "operationId": "createFreitextPartner",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -4172,13 +3919,6 @@
           "freitextPartner"
         ],
         "operationId": "getFreitextPartner",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "description": "Laden eines FreitextPartners über die Id",
         "responses": {
           "200": {
@@ -4255,13 +3995,6 @@
         ],
         "summary": "Aktualisieren eines FreitextPartners",
         "operationId": "updateFreitextPartner",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "description": "Aktualisiert den FreitextPartner",
         "requestBody": {
           "required": true,
@@ -4332,13 +4065,6 @@
         ],
         "summary": "Löschen eines FreitextPartners",
         "operationId": "deleteFreitextPartner",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "responses": {
           "204": {
             "description": "FreitextPartner gelöscht"
@@ -4406,13 +4132,6 @@
         ],
         "summary": "Lesen der Label",
         "operationId": "readLabel",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "parameters": [
           {
             "in": "query",
@@ -4510,13 +4229,6 @@
         ],
         "summary": "Erstellen eines neuen Labels",
         "operationId": "createLabel",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -4642,13 +4354,6 @@
           "label"
         ],
         "operationId": "getLabel",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "description": "Laden eines Labels über die UUID",
         "responses": {
           "200": {
@@ -4725,13 +4430,6 @@
         ],
         "summary": "Aktualisieren eines Labels",
         "operationId": "updateLabel",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "description": "Aktualisiert das Label",
         "requestBody": {
           "required": true,
@@ -4802,13 +4500,6 @@
         ],
         "summary": "Löschen eines Labels",
         "operationId": "deleteLabel",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "responses": {
           "204": {
             "description": "Label gelöscht"
@@ -4876,13 +4567,6 @@
         ],
         "summary": "Lesen der Oidc Clients über die Belege hochgeladen wurden",
         "operationId": "readOidcClients",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:beleg:read"
-            ]
-          }
-        ],
         "responses": {
           "200": {
             "description": "Oidc Clients geladen",
@@ -4972,13 +4656,6 @@
         ],
         "summary": "Lesen der Ordner",
         "operationId": "readOrdner",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "parameters": [
           {
             "in": "query",
@@ -5076,13 +4753,6 @@
         ],
         "summary": "Erstellen eines neuen Ordners",
         "operationId": "createOrdner",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5208,13 +4878,6 @@
           "ordner"
         ],
         "operationId": "getOrdner",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "description": "Laden eines Ordners über die UUID",
         "responses": {
           "200": {
@@ -5291,13 +4954,6 @@
         ],
         "summary": "Aktualisieren eines Ordners",
         "operationId": "updateOrdner",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "description": "Aktualisiert den Ordner",
         "requestBody": {
           "required": true,
@@ -5368,13 +5024,6 @@
         ],
         "summary": "Löschen eines Ordners",
         "operationId": "deleteOrdner",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:manage"
-            ]
-          }
-        ],
         "responses": {
           "204": {
             "description": "Ordner gelöscht"
@@ -5442,13 +5091,6 @@
         ],
         "summary": "Lesen der Stichworte",
         "operationId": "readStichworte",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "parameters": [
           {
             "in": "query",
@@ -5569,13 +5211,6 @@
           "stichwort"
         ],
         "operationId": "getStichwort",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "description": "Laden eines Stichworts über die UUID",
         "responses": {
           "200": {
@@ -5665,13 +5300,6 @@
         ],
         "summary": "Lesen der Vorgangsarten",
         "operationId": "readVorgangsarten",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "parameters": [
           {
             "in": "query",
@@ -5799,13 +5427,6 @@
           "vorgangsart"
         ],
         "operationId": "getVorgangsart",
-        "security": [
-          {
-            "oauth-ld": [
-              "beon:inhaber:stammdaten:read"
-            ]
-          }
-        ],
         "description": "Laden einer Vorgangsart über die UUID",
         "responses": {
           "200": {
