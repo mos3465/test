@@ -239,28 +239,6 @@
       }
     }
   },
-  "security": [
-    {
-      "oidc-ld-prod": [
-        "jf:api:beleg-daten-erkennung"
-      ]
-    },
-    {
-      "oidc-ld-staging": [
-        "jf:api:beleg-daten-erkennung"
-      ]
-    },
-    {
-      "oidc-ld-test": [
-        "jf:api:beleg-daten-erkennung"
-      ]
-    },
-    {
-      "oidc-ld-dev": [
-        "jf:api:beleg-daten-erkennung"
-      ]
-    }
-  ],
   "components": {
     "securitySchemes": {
       "oidc-ld-prod": {
@@ -309,16 +287,6 @@
               "jf:api:beleg-daten-erkennung": "Durchführung Beleg-Daten-Erkennung"
             }
           }
-        }
-      }
-    },
-    "parameters": {
-      "FileId": {
-        "name": "fileId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "$ref": "#/components/schemas/FileId"
         }
       }
     },

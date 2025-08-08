@@ -1494,64 +1494,6 @@
         }
       }
     },
-    "parameters": {
-      "BenutzerId": {
-        "name": "benutzerId",
-        "description": "Id des Benutzers, der die Aktion durchführt.",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "8f69b58d-2c0d-4398-bc72-9bd226e0bb16"
-        }
-      },
-      "Betriebsnummer": {
-        "name": "betriebsnummer",
-        "description": "Betriebsnummer einer Firma bzw. eines Mandanten.\nWird benötigt, wenn für einen Mandanten ein Kunde/Lieferant angelegt werden soll.\n",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "$ref": "#/components/schemas/Betriebsnummer"
-        }
-      },
-      "PartnerId": {
-        "name": "partnerId",
-        "description": "Id des Partners.",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "$ref": "#/components/schemas/PartnerId"
-        }
-      },
-      "PartnerFilter": {
-        "name": "partnerFilter",
-        "description": "Ermöglicht die Filterung von Partnern nach bestimmten Kriterien.",
-        "in": "query",
-        "schema": {
-          "$ref": "#/components/schemas/PartnerFilter"
-        },
-        "explode": true
-      },
-      "FirmaId": {
-        "name": "firmaId",
-        "description": "Identifikation einer Firma.",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "$ref": "#/components/schemas/FirmaId"
-        }
-      },
-      "FirmaIdPath": {
-        "name": "firmaId",
-        "description": "Identifikation einer Firma.",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "$ref": "#/components/schemas/FirmaId"
-        }
-      }
-    },
     "schemas": {
       "Adresse": {
         "description": "Adressdaten zu einem Partner oder einer Firma.\nJe nach Adressart gibt es unterschiedliche Pflichtfelder.\nBei der Adressart Strasse muss das Feld Strasse gefüllt sein.\nBei der Adressart Postfach muss das Feld Postfach gefüllt sein.\nBei der Adressart Grosskunde muss kein zusätzliches Feld gefüllt sein.\n",
