@@ -77,20 +77,6 @@
         ],
         "summary": "Lesen von Partnervorschlägen zu einem Beleg bzw. Beleg-Inhalt",
         "operationId": "readBelegPartnerSuggestionsInternal",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "inhaltId",
-            "description": "Id die einen Inhalt/Datei identifiziert.<br>\n",
-            "required": true,
-            "schema": {
-              "description": "Id eines Beleginhalts (Content)\n",
-              "type": "string",
-              "format": "uuid",
-              "example": "ce9be6ec-e27a-4856-b5be-ee496715f573"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Partnervorschläge für den Beleg.\n",
@@ -156,19 +142,6 @@
         ],
         "summary": "Lesen des Import-Status zu Belegen bzw. Beleg-Inhalten",
         "operationId": "readBelegStatusInternal",
-        "parameters": [
-          {
-            "name": "inhaltIds",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Der Beleg wurde erfolgreich hochgeladen und wird nun verarbeitet.<br>\n",
@@ -338,20 +311,6 @@
       }
     },
     "/internal/v1/belege/{belegId}/content": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "get": {
         "summary": "Herunterladen eines Belegs",
         "tags": [
@@ -424,20 +383,6 @@
       }
     },
     "/internal/v1/belege/{belegId}/content/original": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "get": {
         "summary": "Herunterladen des Originalbelegs",
         "tags": [
@@ -510,20 +455,6 @@
       }
     },
     "/internal/v1/belege/{belegId}/content/enhanced": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "get": {
         "summary": "Herunterladen des Belegs mit erkanntem Text",
         "tags": [
@@ -957,63 +888,6 @@
           "inhaber"
         ],
         "operationId": "getInhabers",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "inhaberFilter",
-            "description": "Objekt für die Filterung von Inhabern.<br>\n",
-            "schema": {
-              "description": "Enthält die Filterkriterien, mit Hilfe derer Inhaber gesucht/gefiltert werden.<br>\n",
-              "type": "object",
-              "properties": {
-                "nummerContains": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "nummerStartsWith": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "bezeichnungContains": {
-                  "type": "string"
-                },
-                "bezeichnungStartsWith": {
-                  "type": "string"
-                }
-              }
-            },
-            "explode": true
-          },
-          {
-            "in": "query",
-            "name": "inhaberPageable",
-            "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Inhabern.<br>\n",
-            "schema": {
-              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
-              "type": "object",
-              "properties": {
-                "offset": {
-                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                  "type": "integer",
-                  "format": "int64",
-                  "default": 0,
-                  "minimum": 0,
-                  "example": 100
-                },
-                "limit": {
-                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                  "type": "integer",
-                  "format": "int32",
-                  "default": 20,
-                  "minimum": 1,
-                  "maximum": 100,
-                  "example": 15
-                }
-              }
-            },
-            "explode": true
-          }
-        ],
         "description": "Gibt die Inhaber zurück, auf die Zugriff besteht.\n",
         "responses": {
           "200": {
@@ -1089,20 +963,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "summary": "Lesen eines Inhabers",
         "tags": [
@@ -1202,340 +1062,12 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "beleg"
         ],
         "summary": "Lesen der Belege",
         "operationId": "readBelege",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "belegFilter",
-            "description": "Objekt für die Filterung von Belegen.<br>\n",
-            "schema": {
-              "description": "Enthält die Filterkriterien, mit Hilfe derer Belege gesucht/gefiltert werden.<br>\n",
-              "type": "object",
-              "properties": {
-                "offen": {
-                  "description": "Status des Belegs, nach dem Import.<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "bearbeitet": {
-                  "description": "Status des Belegs, nachdem er Bearbeitet wurde.<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "festgeschrieben": {
-                  "description": "Status des Belegs, wenn er entgültig archiviert wurde.<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "storniert": {
-                  "description": "Status des Belegs, wenn die Festschreibung fehlerhaft war.<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "uploadBuchstelle": {
-                  "description": "Gibt an ob der Beleg von der Buchstelle für einen Mandanten hochgeladen wurde\n",
-                  "type": "boolean"
-                },
-                "datumVon": {
-                  "description": "Datum eines Belegs.<br>\nDies kann z.B. das Rechnungsdatum bei einer Rechnung<br>\noder das Angebotsdatum bei einem Angebot sein.<br>\n",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "datumBis": {
-                  "description": "Datum eines Belegs.<br>\nDies kann z.B. das Rechnungsdatum bei einer Rechnung<br>\noder das Angebotsdatum bei einem Angebot sein.<br>\n",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "erstelltVon": {
-                  "description": "Datum eines Belegs.<br>\nDies kann z.B. das Rechnungsdatum bei einer Rechnung<br>\noder das Angebotsdatum bei einem Angebot sein.<br>\n",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "erstelltBis": {
-                  "description": "Datum eines Belegs.<br>\nDies kann z.B. das Rechnungsdatum bei einer Rechnung<br>\noder das Angebotsdatum bei einem Angebot sein.<br>\n",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "jahrVon": {
-                  "description": "Das Jahr zu dem der Beleg gehört.<br>\nHiermit ist das Jahr gemeint in dem der Geschäftsvorfall aufgetreten ist.<br>\nSo kann z.B. eine Rechnung im neuen Jahr auf einen Geschäftsvorfall im letzten jahr verweisen.<br>\n",
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 1900,
-                  "maximum": 2100,
-                  "example": 2020
-                },
-                "jahrBis": {
-                  "description": "Das Jahr zu dem der Beleg gehört.<br>\nHiermit ist das Jahr gemeint in dem der Geschäftsvorfall aufgetreten ist.<br>\nSo kann z.B. eine Rechnung im neuen Jahr auf einen Geschäftsvorfall im letzten jahr verweisen.<br>\n",
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 1900,
-                  "maximum": 2100,
-                  "example": 2020
-                },
-                "faelligkeitsdatumVon": {
-                  "description": "Datum an dem die Zahlung für den Beleg fällig ist.",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "faelligkeitsdatumBis": {
-                  "description": "Datum an dem die Zahlung für den Beleg fällig ist.",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "nummerVon": {
-                  "description": "Nummer eines Belegs.\nWird beim Festschreiben vergeben.\nDie nummer ist sobald sie vergeben ist unveränderlich, lückenlos und eindeutig je Inhaber (Betrieb)\n",
-                  "type": "integer",
-                  "format": "int64",
-                  "minimum": 1,
-                  "maximum": 999999999999,
-                  "example": 3278
-                },
-                "nummerBis": {
-                  "description": "Nummer eines Belegs.\nWird beim Festschreiben vergeben.\nDie nummer ist sobald sie vergeben ist unveränderlich, lückenlos und eindeutig je Inhaber (Betrieb)\n",
-                  "type": "integer",
-                  "format": "int64",
-                  "minimum": 1,
-                  "maximum": 999999999999,
-                  "example": 3278
-                },
-                "betragVon": {
-                  "description": "(Positiver) Betrag des gesuchten Belegs",
-                  "type": "number",
-                  "example": 130.76,
-                  "minimum": 0,
-                  "maximum": 9999999.99
-                },
-                "betragBis": {
-                  "description": "(Positiver) Betrag des gesuchten Belegs",
-                  "type": "number",
-                  "example": 130.76,
-                  "minimum": 0,
-                  "maximum": 9999999.99
-                },
-                "zahlungsbetragVon": {
-                  "description": "(Positiver) Betrag des gesuchten Belegs",
-                  "type": "number",
-                  "example": 130.76,
-                  "minimum": 0,
-                  "maximum": 9999999.99
-                },
-                "zahlungsbetragBis": {
-                  "description": "(Positiver) Betrag des gesuchten Belegs",
-                  "type": "number",
-                  "example": 130.76,
-                  "minimum": 0,
-                  "maximum": 9999999.99
-                },
-                "vorgangsartId": {
-                  "description": "Id der Vorgangsart",
-                  "type": "string",
-                  "format": "uuid",
-                  "example": "b6ccf73b-b472-4f2a-911d-81a3d31cdfab"
-                },
-                "vorgangsartIds": {
-                  "type": "array",
-                  "maxItems": 100,
-                  "items": {
-                    "description": "Id der Vorgangsart",
-                    "type": "string",
-                    "format": "uuid",
-                    "example": "b6ccf73b-b472-4f2a-911d-81a3d31cdfab"
-                  }
-                },
-                "partnerBezeichnung": {
-                  "description": "Bezeichnung eines Partners.<br>\nDies kann die Bezeichnung eines Partners aus den Stammdaten sein<br>\noder eine Freitexteingabe, zu der es keinen partner in den Stammdaten gibt.<br>\n",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 70,
-                  "example": "Landwirtschaftskammer"
-                },
-                "erlaeuterungBezeichnung": {
-                  "description": "String der Erlaeuterung",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 100,
-                  "example": "Fahrtkostenerstattung"
-                },
-                "stichwortIds": {
-                  "type": "array",
-                  "maxItems": 100,
-                  "items": {
-                    "description": "Id die ein Stichwort aus den Stammdaten identifiziert.<br>\n",
-                    "type": "string",
-                    "format": "uuid",
-                    "example": "6285a675-24a8-4001-931f-3e6f83ddcc1b"
-                  }
-                },
-                "zahlungsart": {
-                  "description": "Zahlungsart der Zahlung zu einem Beleg\n",
-                  "type": "string",
-                  "enum": [
-                    "Lastschrift",
-                    "Ueberweisung",
-                    "PayPal",
-                    "AmazonPayments",
-                    "Bar",
-                    "Kreditkarte",
-                    "Warenwirtschaft"
-                  ]
-                },
-                "iban": {
-                  "description": "IBAN eines Bankkontos",
-                  "type": "string",
-                  "format": "iban",
-                  "maxLength": 32,
-                  "example": "DE15370501980000001115"
-                },
-                "verwendungszweck": {
-                  "description": "Verwendungszweck der Zahlung des Belegs",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 140,
-                  "example": "Rechnungsnummer 1337"
-                },
-                "kommentar": {
-                  "description": "Kommentar zu einem Objekt.<br>\n",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 2000,
-                  "example": "Hydraulikschlauch für Forstzange, Gelenkwelle für Güllefass"
-                },
-                "volltext": {
-                  "description": "Volltextsuche zu einem Beleg",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 255,
-                  "example": "Lohnfortzahlungsantrag Oktober"
-                },
-                "excludeBelege": {
-                  "type": "array",
-                  "maxItems": 100,
-                  "items": {
-                    "description": "Id die einen Beleg identifiziert.<br>\n",
-                    "type": "string",
-                    "format": "uuid",
-                    "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-                  }
-                },
-                "onlyBelege": {
-                  "type": "array",
-                  "maxItems": 100,
-                  "items": {
-                    "description": "Id die einen Beleg identifiziert.<br>\n",
-                    "type": "string",
-                    "format": "uuid",
-                    "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-                  }
-                },
-                "dublettenOnly": {
-                  "type": "boolean",
-                  "default": false
-                },
-                "contentType": {
-                  "description": "MIME-Type\nsiehe https://tools.ietf.org/html/rfc6838#section-4.2\n",
-                  "type": "string",
-                  "maxLength": 127
-                },
-                "textfilter": {
-                  "type": "array",
-                  "maxItems": 10,
-                  "items": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 255,
-                    "example": "Stallbau 2022"
-                  }
-                },
-                "textFilterVerodern": {
-                  "description": "Sollen die Texte in der Suche verodert werden?",
-                  "type": "boolean",
-                  "default": false
-                },
-                "oidcClients": {
-                  "description": "Uuids der Oidc Clients auf die gefiltert werden soll",
-                  "type": "array",
-                  "maxItems": 10,
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                },
-                "eingangsbeleg": {
-                  "description": "Ob sich ein Beleg im Eingang-Belegbuch befindet<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "ausgangsbeleg": {
-                  "description": "Ob sich ein Beleg im Ausgang-Belegbuch befindet<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "erkennungsart": {
-                  "type": "array",
-                  "maxItems": 9,
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "explode": true
-          },
-          {
-            "in": "query",
-            "name": "belegPageable",
-            "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Belegen.<br>\n",
-            "schema": {
-              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
-              "type": "object",
-              "properties": {
-                "offset": {
-                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                  "type": "integer",
-                  "format": "int64",
-                  "default": 0,
-                  "minimum": 0,
-                  "example": 100
-                },
-                "limit": {
-                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                  "type": "integer",
-                  "format": "int32",
-                  "default": 20,
-                  "minimum": 1,
-                  "maximum": 100,
-                  "example": 15
-                }
-              }
-            },
-            "explode": true
-          }
-        ],
         "responses": {
           "200": {
             "description": "Belege geladen",
@@ -2253,311 +1785,12 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/count": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "beleg"
         ],
         "summary": "Lesen der Anzahl der Belege",
         "operationId": "countBelege",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "belegFilter",
-            "description": "Objekt für die Filterung von Belegen.<br>\n",
-            "schema": {
-              "description": "Enthält die Filterkriterien, mit Hilfe derer Belege gesucht/gefiltert werden.<br>\n",
-              "type": "object",
-              "properties": {
-                "offen": {
-                  "description": "Status des Belegs, nach dem Import.<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "bearbeitet": {
-                  "description": "Status des Belegs, nachdem er Bearbeitet wurde.<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "festgeschrieben": {
-                  "description": "Status des Belegs, wenn er entgültig archiviert wurde.<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "storniert": {
-                  "description": "Status des Belegs, wenn die Festschreibung fehlerhaft war.<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "uploadBuchstelle": {
-                  "description": "Gibt an ob der Beleg von der Buchstelle für einen Mandanten hochgeladen wurde\n",
-                  "type": "boolean"
-                },
-                "datumVon": {
-                  "description": "Datum eines Belegs.<br>\nDies kann z.B. das Rechnungsdatum bei einer Rechnung<br>\noder das Angebotsdatum bei einem Angebot sein.<br>\n",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "datumBis": {
-                  "description": "Datum eines Belegs.<br>\nDies kann z.B. das Rechnungsdatum bei einer Rechnung<br>\noder das Angebotsdatum bei einem Angebot sein.<br>\n",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "erstelltVon": {
-                  "description": "Datum eines Belegs.<br>\nDies kann z.B. das Rechnungsdatum bei einer Rechnung<br>\noder das Angebotsdatum bei einem Angebot sein.<br>\n",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "erstelltBis": {
-                  "description": "Datum eines Belegs.<br>\nDies kann z.B. das Rechnungsdatum bei einer Rechnung<br>\noder das Angebotsdatum bei einem Angebot sein.<br>\n",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "jahrVon": {
-                  "description": "Das Jahr zu dem der Beleg gehört.<br>\nHiermit ist das Jahr gemeint in dem der Geschäftsvorfall aufgetreten ist.<br>\nSo kann z.B. eine Rechnung im neuen Jahr auf einen Geschäftsvorfall im letzten jahr verweisen.<br>\n",
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 1900,
-                  "maximum": 2100,
-                  "example": 2020
-                },
-                "jahrBis": {
-                  "description": "Das Jahr zu dem der Beleg gehört.<br>\nHiermit ist das Jahr gemeint in dem der Geschäftsvorfall aufgetreten ist.<br>\nSo kann z.B. eine Rechnung im neuen Jahr auf einen Geschäftsvorfall im letzten jahr verweisen.<br>\n",
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 1900,
-                  "maximum": 2100,
-                  "example": 2020
-                },
-                "faelligkeitsdatumVon": {
-                  "description": "Datum an dem die Zahlung für den Beleg fällig ist.",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "faelligkeitsdatumBis": {
-                  "description": "Datum an dem die Zahlung für den Beleg fällig ist.",
-                  "type": "string",
-                  "format": "date",
-                  "example": "2020-07-27"
-                },
-                "nummerVon": {
-                  "description": "Nummer eines Belegs.\nWird beim Festschreiben vergeben.\nDie nummer ist sobald sie vergeben ist unveränderlich, lückenlos und eindeutig je Inhaber (Betrieb)\n",
-                  "type": "integer",
-                  "format": "int64",
-                  "minimum": 1,
-                  "maximum": 999999999999,
-                  "example": 3278
-                },
-                "nummerBis": {
-                  "description": "Nummer eines Belegs.\nWird beim Festschreiben vergeben.\nDie nummer ist sobald sie vergeben ist unveränderlich, lückenlos und eindeutig je Inhaber (Betrieb)\n",
-                  "type": "integer",
-                  "format": "int64",
-                  "minimum": 1,
-                  "maximum": 999999999999,
-                  "example": 3278
-                },
-                "betragVon": {
-                  "description": "(Positiver) Betrag des gesuchten Belegs",
-                  "type": "number",
-                  "example": 130.76,
-                  "minimum": 0,
-                  "maximum": 9999999.99
-                },
-                "betragBis": {
-                  "description": "(Positiver) Betrag des gesuchten Belegs",
-                  "type": "number",
-                  "example": 130.76,
-                  "minimum": 0,
-                  "maximum": 9999999.99
-                },
-                "zahlungsbetragVon": {
-                  "description": "(Positiver) Betrag des gesuchten Belegs",
-                  "type": "number",
-                  "example": 130.76,
-                  "minimum": 0,
-                  "maximum": 9999999.99
-                },
-                "zahlungsbetragBis": {
-                  "description": "(Positiver) Betrag des gesuchten Belegs",
-                  "type": "number",
-                  "example": 130.76,
-                  "minimum": 0,
-                  "maximum": 9999999.99
-                },
-                "vorgangsartId": {
-                  "description": "Id der Vorgangsart",
-                  "type": "string",
-                  "format": "uuid",
-                  "example": "b6ccf73b-b472-4f2a-911d-81a3d31cdfab"
-                },
-                "vorgangsartIds": {
-                  "type": "array",
-                  "maxItems": 100,
-                  "items": {
-                    "description": "Id der Vorgangsart",
-                    "type": "string",
-                    "format": "uuid",
-                    "example": "b6ccf73b-b472-4f2a-911d-81a3d31cdfab"
-                  }
-                },
-                "partnerBezeichnung": {
-                  "description": "Bezeichnung eines Partners.<br>\nDies kann die Bezeichnung eines Partners aus den Stammdaten sein<br>\noder eine Freitexteingabe, zu der es keinen partner in den Stammdaten gibt.<br>\n",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 70,
-                  "example": "Landwirtschaftskammer"
-                },
-                "erlaeuterungBezeichnung": {
-                  "description": "String der Erlaeuterung",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 100,
-                  "example": "Fahrtkostenerstattung"
-                },
-                "stichwortIds": {
-                  "type": "array",
-                  "maxItems": 100,
-                  "items": {
-                    "description": "Id die ein Stichwort aus den Stammdaten identifiziert.<br>\n",
-                    "type": "string",
-                    "format": "uuid",
-                    "example": "6285a675-24a8-4001-931f-3e6f83ddcc1b"
-                  }
-                },
-                "zahlungsart": {
-                  "description": "Zahlungsart der Zahlung zu einem Beleg\n",
-                  "type": "string",
-                  "enum": [
-                    "Lastschrift",
-                    "Ueberweisung",
-                    "PayPal",
-                    "AmazonPayments",
-                    "Bar",
-                    "Kreditkarte",
-                    "Warenwirtschaft"
-                  ]
-                },
-                "iban": {
-                  "description": "IBAN eines Bankkontos",
-                  "type": "string",
-                  "format": "iban",
-                  "maxLength": 32,
-                  "example": "DE15370501980000001115"
-                },
-                "verwendungszweck": {
-                  "description": "Verwendungszweck der Zahlung des Belegs",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 140,
-                  "example": "Rechnungsnummer 1337"
-                },
-                "kommentar": {
-                  "description": "Kommentar zu einem Objekt.<br>\n",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 2000,
-                  "example": "Hydraulikschlauch für Forstzange, Gelenkwelle für Güllefass"
-                },
-                "volltext": {
-                  "description": "Volltextsuche zu einem Beleg",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 255,
-                  "example": "Lohnfortzahlungsantrag Oktober"
-                },
-                "excludeBelege": {
-                  "type": "array",
-                  "maxItems": 100,
-                  "items": {
-                    "description": "Id die einen Beleg identifiziert.<br>\n",
-                    "type": "string",
-                    "format": "uuid",
-                    "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-                  }
-                },
-                "onlyBelege": {
-                  "type": "array",
-                  "maxItems": 100,
-                  "items": {
-                    "description": "Id die einen Beleg identifiziert.<br>\n",
-                    "type": "string",
-                    "format": "uuid",
-                    "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-                  }
-                },
-                "dublettenOnly": {
-                  "type": "boolean",
-                  "default": false
-                },
-                "contentType": {
-                  "description": "MIME-Type\nsiehe https://tools.ietf.org/html/rfc6838#section-4.2\n",
-                  "type": "string",
-                  "maxLength": 127
-                },
-                "textfilter": {
-                  "type": "array",
-                  "maxItems": 10,
-                  "items": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 255,
-                    "example": "Stallbau 2022"
-                  }
-                },
-                "textFilterVerodern": {
-                  "description": "Sollen die Texte in der Suche verodert werden?",
-                  "type": "boolean",
-                  "default": false
-                },
-                "oidcClients": {
-                  "description": "Uuids der Oidc Clients auf die gefiltert werden soll",
-                  "type": "array",
-                  "maxItems": 10,
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                },
-                "eingangsbeleg": {
-                  "description": "Ob sich ein Beleg im Eingang-Belegbuch befindet<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "ausgangsbeleg": {
-                  "description": "Ob sich ein Beleg im Ausgang-Belegbuch befindet<br>\n",
-                  "type": "boolean",
-                  "nullable": false
-                },
-                "erkennungsart": {
-                  "type": "array",
-                  "maxItems": 9,
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "explode": true
-          }
-        ],
         "responses": {
           "200": {
             "description": "Beleganzahl geladen",
@@ -2623,20 +1856,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/importstatus": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "beleg"
@@ -2733,32 +1952,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/importstatus/{inhaltId}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "inhaltId",
-          "description": "Id die einen Inhalt/Datei identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Beleginhalts (Content)\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ce9be6ec-e27a-4856-b5be-ee496715f573"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "beleg"
@@ -2852,20 +2045,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/heften": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "post": {
         "summary": "Heften von Belegen",
         "tags": [
@@ -3022,32 +2201,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "get": {
         "summary": "Abruf eines Belegs",
         "tags": [
@@ -3727,32 +2880,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}/suggestions": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "get": {
         "summary": "Vorschlagswerte zu einem Beleg",
         "tags": [
@@ -3864,32 +2991,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}/content": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "get": {
         "summary": "Herunterladen eines Belegs",
         "tags": [
@@ -3962,32 +3063,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}/content/original": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "get": {
         "summary": "Herunterladen des Originalbelegs",
         "tags": [
@@ -4060,32 +3135,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}/content/ocr": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "get": {
         "summary": "Herunterladen des Belegs mit erkanntem Text",
         "tags": [
@@ -4159,32 +3208,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}/content/enhanced": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "get": {
         "summary": "Herunterladen des Belegs mit erkanntem Text",
         "tags": [
@@ -4257,32 +3280,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}/entheften": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "post": {
         "summary": "Entheften eines Belegs",
         "tags": [
@@ -4380,44 +3377,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}/move/{destinationInhaberId}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        },
-        {
-          "in": "path",
-          "name": "destinationInhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "post": {
         "summary": "Verschieben eines Belegs",
         "tags": [
@@ -4493,32 +3452,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}/reverse": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "post": {
         "summary": "Stornieren eines Belegs",
         "tags": [
@@ -4624,32 +3557,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}/stipulate": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "post": {
         "summary": "Festschreiben eines Belegs",
         "tags": [
@@ -4725,32 +3632,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/belege/{belegId}/aktionen": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "belegId",
-          "description": "Id die einen Beleg identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen Beleg identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
-          }
-        }
-      ],
       "get": {
         "summary": "Lesen der Aktionen zu einem Beleg",
         "tags": [
@@ -4865,75 +3746,12 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/erlaeuterungen": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "erlaeuterung"
         ],
         "summary": "Lesen der Erläuterungen",
         "operationId": "readErlaeuterungen",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "erlaeuterungFilter",
-            "description": "Objekt für die Filterung von Erläuterungen.<br>\n",
-            "schema": {
-              "description": "Enthält die Filterkriterien, mit Hilfe derer Erläuterungen gesucht/gefiltert werden.<br>\n",
-              "type": "object",
-              "properties": {
-                "bezeichnungContains": {
-                  "type": "string"
-                },
-                "bezeichnungStartsWith": {
-                  "type": "string"
-                }
-              }
-            },
-            "explode": true
-          },
-          {
-            "in": "query",
-            "name": "erlaeuterungPageable",
-            "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Erläuterungen.<br>\n",
-            "schema": {
-              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
-              "type": "object",
-              "properties": {
-                "offset": {
-                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                  "type": "integer",
-                  "format": "int64",
-                  "default": 0,
-                  "minimum": 0,
-                  "example": 100
-                },
-                "limit": {
-                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                  "type": "integer",
-                  "format": "int32",
-                  "default": 20,
-                  "minimum": 1,
-                  "maximum": 100,
-                  "example": 15
-                }
-              }
-            },
-            "explode": true
-          }
-        ],
         "responses": {
           "200": {
             "description": "Erläuterungen geladen",
@@ -5107,32 +3925,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/erlaeuterungen/{erlaeuterungId}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "erlaeuterungId",
-          "description": "Id die eine Erläuterung identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id der Erlaeuterung",
-            "type": "string",
-            "format": "uuid",
-            "example": "7451432c-db6d-47ad-a71e-ee9720d5639a"
-          }
-        }
-      ],
       "get": {
         "summary": "Laden einer Erläuterung",
         "tags": [
@@ -5349,74 +4141,12 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/freitextPartner": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "freitextPartner"
         ],
         "summary": "Lesen der FreitextPartner",
         "operationId": "readFreitextPartner",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "freitextPartnerFilter",
-            "description": "Objekt für die Filterung von FreitextPartnern.<br>\n",
-            "schema": {
-              "description": "Enthält die Filterkriterien, mit Hilfe derer FreitextPartner gesucht/gefiltert werden.<br>\n",
-              "type": "object",
-              "properties": {
-                "bezeichnungContains": {
-                  "type": "string"
-                },
-                "bezeichnungStartsWith": {
-                  "type": "string"
-                }
-              }
-            },
-            "explode": true
-          },
-          {
-            "in": "query",
-            "name": "freitextPartnerPageable",
-            "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von FreitextPartner.<br>\n",
-            "schema": {
-              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
-              "type": "object",
-              "properties": {
-                "offset": {
-                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                  "type": "integer",
-                  "format": "int64",
-                  "default": 0,
-                  "minimum": 0,
-                  "example": 100
-                },
-                "limit": {
-                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                  "type": "integer",
-                  "format": "int32",
-                  "default": 20,
-                  "minimum": 1,
-                  "maximum": 100,
-                  "example": 15
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "FreitextPartner geladen",
@@ -5608,32 +4338,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/freitextPartner/{freitextPartnerId}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "freitextPartnerId",
-          "description": "Id die einen FreitextPartner identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die einen FreitextPartner identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "e6d94ecf-1fca-421e-b908-d1d2c8a13952"
-          }
-        }
-      ],
       "get": {
         "summary": "Laden eines FreitextPartners",
         "tags": [
@@ -5850,82 +4554,12 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/label": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "label"
         ],
         "summary": "Lesen der Label",
         "operationId": "readLabel",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "labelFilter",
-            "description": "Objekt für die Filterung von Labeln.<br>\n",
-            "schema": {
-              "description": "Enthält die Filterkriterien, mit Hilfe derer Label gesucht/gefiltert werden.<br>\n",
-              "type": "object",
-              "properties": {
-                "bezeichnungContains": {
-                  "description": "Bezeichnung eines Labels.",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 100,
-                  "example": "Steuern"
-                },
-                "bezeichnungStartsWith": {
-                  "description": "Bezeichnung eines Labels.",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 100,
-                  "example": "Steuern"
-                }
-              }
-            },
-            "explode": true
-          },
-          {
-            "in": "query",
-            "name": "labelPageable",
-            "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Labeln.<br>\n",
-            "schema": {
-              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
-              "type": "object",
-              "properties": {
-                "offset": {
-                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                  "type": "integer",
-                  "format": "int64",
-                  "default": 0,
-                  "minimum": 0,
-                  "example": 100
-                },
-                "limit": {
-                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                  "type": "integer",
-                  "format": "int32",
-                  "default": 20,
-                  "minimum": 1,
-                  "maximum": 100,
-                  "example": 15
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Label geladen",
@@ -6120,32 +4754,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/label/{labelId}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "labelId",
-          "description": "Id die ein Label identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Labels.",
-            "type": "string",
-            "format": "uuid",
-            "example": "7451432c-db6d-47ad-a71e-ee9720d5639a"
-          }
-        }
-      ],
       "get": {
         "summary": "Laden eines Labels",
         "tags": [
@@ -6362,20 +4970,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/metadaten/oidcClients": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "oidcClients"
@@ -6454,82 +5048,12 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/ordner": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "ordner"
         ],
         "summary": "Lesen der Ordner",
         "operationId": "readOrdner",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "ordnerFilter",
-            "description": "Objekt für die Filterung von Ordnern.<br>\n",
-            "schema": {
-              "description": "Enthält die Filterkriterien, mit Hilfe derer Ordner gesucht/gefiltert werden.<br>\n",
-              "type": "object",
-              "properties": {
-                "bezeichnungContains": {
-                  "description": "Bezeichnung eines Ordners.",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 100,
-                  "example": "Rechnungen"
-                },
-                "bezeichnungStartsWith": {
-                  "description": "Bezeichnung eines Ordners.",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 100,
-                  "example": "Rechnungen"
-                }
-              }
-            },
-            "explode": true
-          },
-          {
-            "in": "query",
-            "name": "ordnerPageable",
-            "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Ordnern.<br>\n",
-            "schema": {
-              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
-              "type": "object",
-              "properties": {
-                "offset": {
-                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                  "type": "integer",
-                  "format": "int64",
-                  "default": 0,
-                  "minimum": 0,
-                  "example": 100
-                },
-                "limit": {
-                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                  "type": "integer",
-                  "format": "int32",
-                  "default": 20,
-                  "minimum": 1,
-                  "maximum": 100,
-                  "example": 15
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Ordner geladen",
@@ -6724,32 +5248,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/ordner/{ordnerId}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "ordnerId",
-          "description": "Id die einen Ordner identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Ordners.",
-            "type": "string",
-            "format": "uuid",
-            "example": "16f37169-71ce-4955-bc9a-86cfc5569d5c"
-          }
-        }
-      ],
       "get": {
         "summary": "Laden eines Ordners",
         "tags": [
@@ -6966,83 +5464,12 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/stichworte": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "stichwort"
         ],
         "summary": "Lesen der Stichworte",
         "operationId": "readStichworte",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "stichwortFilter",
-            "description": "Objekt für die Filterung von Stichworten.<br>\n",
-            "schema": {
-              "description": "Enthält die Filterkriterien, mit Hilfe derer Stichworte gesucht/gefiltert werden.<br>\n",
-              "type": "object",
-              "properties": {
-                "bezeichnungContains": {
-                  "description": "Bezeichnung eines Stichworts.<br>\n",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 100,
-                  "example": "Tierwohl"
-                },
-                "bezeichnungStartsWith": {
-                  "description": "Bezeichnung eines Stichworts.<br>\n",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 100,
-                  "example": "Tierwohl"
-                }
-              }
-            },
-            "explode": true
-          },
-          {
-            "in": "query",
-            "name": "stichwortPageable",
-            "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Stichworten.<br>\n",
-            "schema": {
-              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
-              "type": "object",
-              "properties": {
-                "offset": {
-                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                  "type": "integer",
-                  "format": "int64",
-                  "default": 0,
-                  "minimum": 0,
-                  "example": 100
-                },
-                "limit": {
-                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                  "type": "integer",
-                  "format": "int32",
-                  "default": 20,
-                  "minimum": 1,
-                  "maximum": 100,
-                  "example": 15
-                }
-              }
-            },
-            "explode": true
-          }
-        ],
         "responses": {
           "200": {
             "description": "Stichworte geladen",
@@ -7127,32 +5554,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/stichworte/{stichwortId}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "stichwortId",
-          "description": "Id die ein Stichwort identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id die ein Stichwort aus den Stammdaten identifiziert.<br>\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "6285a675-24a8-4001-931f-3e6f83ddcc1b"
-          }
-        }
-      ],
       "get": {
         "summary": "Laden eines Stichworts",
         "tags": [
@@ -7241,110 +5642,12 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/vorgangsarten": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        }
-      ],
       "get": {
         "tags": [
           "vorgangsart"
         ],
         "summary": "Lesen der Vorgangsarten",
         "operationId": "readVorgangsarten",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vorgangsartFilter",
-            "description": "Objekt für die Filterung von Vorgangsarten.<br>\n",
-            "schema": {
-              "description": "Enthält die Filterkriterien, mit Hilfe derer Vorgangsarten gesucht/gefiltert werden.<br>\n",
-              "type": "object",
-              "properties": {
-                "einfach": {
-                  "description": "Sollen einfache Vorgangsarten zurück gegeben werden?<br>\n",
-                  "type": "boolean"
-                },
-                "erweitert": {
-                  "description": "Sollen erwetierte Vorgangsarten zurück gegeben werden?<br>\n",
-                  "type": "boolean"
-                },
-                "standard": {
-                  "description": "Sollen Stardardvorgangsarten zurück gegeben werden?<br>\n",
-                  "type": "boolean"
-                },
-                "nummerContains": {
-                  "description": "Nummer der Vorgangsart",
-                  "type": "integer",
-                  "format": "int64",
-                  "minimum": 1,
-                  "maximum": 999999999999,
-                  "example": 4
-                },
-                "nummerStartsWith": {
-                  "description": "Nummer der Vorgangsart",
-                  "type": "integer",
-                  "format": "int64",
-                  "minimum": 1,
-                  "maximum": 999999999999,
-                  "example": 4
-                },
-                "bezeichnungContains": {
-                  "description": "Bezeichnung der Vorgangsart",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 100,
-                  "example": "Rechnung"
-                },
-                "bezeichnungStartsWith": {
-                  "description": "Bezeichnung der Vorgangsart",
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 100,
-                  "example": "Rechnung"
-                }
-              }
-            },
-            "explode": true
-          },
-          {
-            "in": "query",
-            "name": "vorgangsartPageable",
-            "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Vorgangsarten.<br>\n",
-            "schema": {
-              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
-              "type": "object",
-              "properties": {
-                "offset": {
-                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                  "type": "integer",
-                  "format": "int64",
-                  "default": 0,
-                  "minimum": 0,
-                  "example": 100
-                },
-                "limit": {
-                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                  "type": "integer",
-                  "format": "int32",
-                  "default": 20,
-                  "minimum": 1,
-                  "maximum": 100,
-                  "example": 15
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Vorgangsarten geladen",
@@ -7448,32 +5751,6 @@
       }
     },
     "/api/v1/inhaber/{inhaberId}/vorgangsarten/{vorgangsartId}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "inhaberId",
-          "description": "Id die einen Inhaber identifiziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id eines Inhabers\n",
-            "type": "string",
-            "format": "uuid",
-            "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
-          }
-        },
-        {
-          "in": "path",
-          "name": "vorgangsartId",
-          "description": "Id die eine Vorgangsart identifziert.<br>\n",
-          "required": true,
-          "schema": {
-            "description": "Id der Vorgangsart",
-            "type": "string",
-            "format": "uuid",
-            "example": "b6ccf73b-b472-4f2a-911d-81a3d31cdfab"
-          }
-        }
-      ],
       "get": {
         "summary": "Laden einer Vorgangsart",
         "tags": [
