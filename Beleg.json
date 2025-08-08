@@ -1,0 +1,5581 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Belege",
+    "version": "1.17.0",
+    "description": "Die Belege aus dem Belegbuch in ADNOVA+ können mittels dieser API bearbeitet, geheftet, entheftet\nsowie festgeschrieben und storniert werden. Des Weiteren können auch neue Belege importiert werden.\nDer Import läuft über eine Queue. Daher kann nach dem Aufruf der \"createBeleg\" - Schnittstelle über die Schnittstelle\n\"importstatus\", mittels der InhaltId, der Status abgefragt werden. Enthält der Importstatus eine BelegId ist der Beleg\nerfolgreich angelegt worden und kann über diese BelegId abgerufen werden.\nDamit der Beleg vollständig bearbeitet und ergänzt werden kann, lassen sich die nötigen Daten zu Vorgangsarten,\nStichworte, Label, Ordner, Erläuterungen und FreitextPartner abrufen und bearbeiten.\nDas Heften und Entheften von Belegen ist ebenfalls möglich,. Beim Entheften ist darauf zu achten, dass die einzelnen\nSeiten wie neue Belege importiert werden. Daher müssen über den Importstatus die neuen BelegIds abgefragt werden,\nwenn der Beleg fertig entheftet ist.\n"
+  },
+  "servers": [
+    {
+      "url": "https://api.adnova.de/beleg-service",
+      "description": "Umgebungen Produktion (Echtdaten)"
+    },
+    {
+      "url": "https://api-wart.adnova.de/beleg-service",
+      "description": "Testumgebung mit Authentication (Kopie Echtdaten) nur über VPN erreichbar"
+    },
+    {
+      "url": "https://api-dev.adnova.de/fnktnext/beleg-service",
+      "description": "FNKTNext-Umgebung Test mit Authentication (Testdaten) nur über VPN erreichbar"
+    }
+  ],
+  "tags": [
+    {
+      "name": "beleg-internal",
+      "description": "Operationen die von internen Systemen (z.B. ADNOVA+) genutzt werden.<br>\nDie Endpunkte sind von Extern nicht zu erreichen.<br>\n"
+    },
+    {
+      "name": "beleg-content-internal",
+      "description": "Operationen die von internen Systemen (z.B. ADNOVA+) genutzt werden um den Inhalt von Belegen zu laden.<br>\n"
+    },
+    {
+      "name": "beleg-fakturierung-internal",
+      "description": "Operationen die von internen Systemen im Kontext der Fakturierung genutzt werden.\n"
+    },
+    {
+      "name": "beleg",
+      "description": "Operationen die einen Beleg betreffen.<br>\nDies sind neben den CRUD-Operationen auch weitere wie<br>\nAufteilen, Zusammenfügen, Festschreiben, Stornieren, etc.<br>\n"
+    },
+    {
+      "name": "beleg-aktionen",
+      "description": "Aktionen sind zusätzliche Vorgänge zu einem Beleg.<br>\nAktionen werden asynchron zur Verarbeitung des Belegs ausgeführt.<br>\n"
+    },
+    {
+      "name": "erlaeuterung",
+      "description": "Operationen die eine Erläuterung betreffen<br>\nCRUD-Operationen<br>\n"
+    },
+    {
+      "name": "freitextPartner",
+      "description": "Operationen die einen FreitextPartner betreffen<br> CRUD-Operationen<br>"
+    },
+    {
+      "name": "inhaber",
+      "description": "Operationen die Inhaber betreffen<br>"
+    },
+    {
+      "name": "label",
+      "description": "Operatioen die Label betreffen<br> CRUD-Operationen<br>"
+    },
+    {
+      "name": "ordner",
+      "description": "Operatioen die Ordner betreffen<br> CRUD-Operationen<br>"
+    },
+    {
+      "name": "stichwort",
+      "description": "Operationen die Stichworte betreffen<br>\n"
+    },
+    {
+      "name": "vorgangsart",
+      "description": "Operationen die Vorgangsarten betreffen<br>\n"
+    }
+  ],
+  "paths": {
+    "/internal/v1/belege/inhalt/{inhaltId}/partner": {
+      "get": {
+        "tags": [
+          "beleg-internal"
+        ],
+        "summary": "Lesen von Partnervorschlägen zu einem Beleg bzw. Beleg-Inhalt",
+        "operationId": "readBelegPartnerSuggestionsInternal",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:internal"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Partnervorschläge für den Beleg.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InternalPartnerSuggestion"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Beleg bzw. Beleg-Inhalt nicht die nötigen Rechte.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Beleg bzw. Beleg-Inhalt oder Belegbuch wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/belege/status": {
+      "get": {
+        "tags": [
+          "beleg-internal"
+        ],
+        "summary": "Lesen des Import-Status zu Belegen bzw. Beleg-Inhalten",
+        "operationId": "readBelegStatusInternal",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:internal"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Der Beleg wurde erfolgreich hochgeladen und wird nun verarbeitet.<br>\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InternalBelegStatus"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/belege": {
+      "post": {
+        "tags": [
+          "beleg-internal"
+        ],
+        "summary": "Anlegen eines Belegs",
+        "operationId": "uploadBelegInternal",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:internal"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Dateiinhalt zu einem Beleg.<br>\nHiermit sind die Binärdaten gemeint.<br>\nEs werden folgende Dateitypen für den Upload unterstützt:<br>\n- .bmp\n- .csv\n- .doc\n- .docx\n- .docm\n- .eml\n- .gif\n- .htm\n- .html\n- .jpeg\n- .jpg\n- .msg\n- .odc\n- .odf\n- .odg\n- .odi\n- .odm\n- .odp\n- .ods\n- .odt\n- .oft\n- .otg\n- .otp\n- .ots\n- .ott\n- .pdf\n- .png\n- .ppt\n- .pptx\n- .tif\n- .tiff\n- .txt\n- .xls\n- .xlsm\n- .xlsx\n- .xml\nEs wird basierend auf dem Inhalt (Magic Bytes) und über den ursprünglichen Dateinamen\n(wenn nicht über Magic Bytes möglich oder uneindeutig) der MIME-Type bestimmt.\nBasierend auf diesem MIME-Type wird geprüft, ob die Datei zulässig ist.\n"
+                  },
+                  "data": {
+                    "$ref": "#/components/schemas/InternalCreateRequest"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Der Beleg wurde erfolgreich hochgeladen und wird nun verarbeitet.<br>\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Anlegen eines Belegs\n"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für das Belegbuch nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Belegbuch wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Dateityp nicht unterstützt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/belege/{belegId}/content": {
+      "get": {
+        "summary": "Herunterladen eines Belegs",
+        "tags": [
+          "beleg-content-internal"
+        ],
+        "operationId": "getBelegContentInternal",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:content:internal"
+            ]
+          }
+        ],
+        "description": "Laden einer Datei über die UUID. Wenn der Beleg durch die Texterkennung verarbeitet wurde, so wird die daraus resultierende Datei geladen. Ansonsten wird die Originaldatei (ggf. ohne Text) geladen.",
+        "responses": {
+          "200": {
+            "description": "Inhalt zum Beleg zur Id\n",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Beleg gefunden, dieser hat aber keinen Inhalt"
+          },
+          "400": {
+            "description": "Fehler wenn es sich bei der UUID um keine gültige UUID handelt"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/belege/{belegId}/content/original": {
+      "get": {
+        "summary": "Herunterladen des Originalbelegs",
+        "tags": [
+          "beleg-content-internal"
+        ],
+        "operationId": "getBelegContentOriginalInternal",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:content:internal"
+            ]
+          }
+        ],
+        "description": "Laden der Originaldatei über die UUID",
+        "responses": {
+          "200": {
+            "description": "Originaler Inhalt zum Beleg zur Id\n",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Beleg gefunden, dieser hat aber keinen Inhalt"
+          },
+          "400": {
+            "description": "Fehler wenn es sich bei der UUID um keine gültige UUID handelt"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/belege/{belegId}/content/enhanced": {
+      "get": {
+        "summary": "Herunterladen des Belegs mit erkanntem Text",
+        "tags": [
+          "beleg-content-internal"
+        ],
+        "operationId": "getBelegContentEnhancedInternal",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:content:internal"
+            ]
+          }
+        ],
+        "description": "Laden der aus der Texterkennung resultierenden Datei über die UUID.",
+        "responses": {
+          "200": {
+            "description": "Verarbeiteter Inhalt zum Beleg zur Id\n",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Beleg gefunden, dieser hat aber keinen Inhalt aus der Texterkennung"
+          },
+          "400": {
+            "description": "Fehler wenn es sich bei der UUID um keine gültige UUID handelt"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/fakturierung/belege/stipulate": {
+      "put": {
+        "tags": [
+          "beleg-fakturierung-internal"
+        ],
+        "summary": "Festschreiben eines Belegs",
+        "operationId": "stipulateFakturierungsbeleg",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:fakturierung:beleg:internal"
+            ]
+          }
+        ],
+        "description": "Legt zu einem Fakturierungsbeleg-Portal einen neuen Beleg mit den übergebenen Daten an.\nDieser Beleg wird dann direkt festgeschrieben.\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "PDF- oder XML-Datei die in der Fakturierung-Portal erzeugt wird.\n"
+                  },
+                  "data": {
+                    "$ref": "#/components/schemas/CreateFakturierungsbelegRequest"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Der festgeschriebene Beleg wurde erfolgreich angelegt.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFakturierungsbelegResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Festschreiben eines Belegs\n"
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen"
+          },
+          "404": {
+            "description": "Entität nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/fakturierung/belege/reverse": {
+      "put": {
+        "tags": [
+          "beleg-fakturierung-internal"
+        ],
+        "summary": "Stornieren eines Belegs",
+        "operationId": "reverseFakturierungsbeleg",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:fakturierung:beleg:internal"
+            ]
+          }
+        ],
+        "description": "Storniert den zu einem stornierten Fakturierungsbeleg-Portal gehörigen Beleg.\nLegt zu dem Korrektur-Fakturierungsbeleg-Portal mit den übergebenen Daten einen neuen Beleg an.\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "PDF- oder XML-Datei die in der Fakturierung-Portal erzeugt wird.\n"
+                  },
+                  "data": {
+                    "$ref": "#/components/schemas/ReverseFakturierungsbelegRequest"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Der Beleg wurde erfolgreich storniert und der Korrekturbeleg angelegt.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReverseFakturierungsbelegResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Stornieren eines Belegs\n"
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen"
+          },
+          "404": {
+            "description": "Entität nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber": {
+      "get": {
+        "summary": "Lesen von Inhabern",
+        "tags": [
+          "inhaber"
+        ],
+        "operationId": "getInhabers",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:read"
+            ]
+          }
+        ],
+        "description": "Gibt die Inhaber zurück, auf die Zugriff besteht.\n",
+        "responses": {
+          "200": {
+            "description": "Inhaber geladen.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Inhaber"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}": {
+      "get": {
+        "summary": "Lesen eines Inhabers",
+        "tags": [
+          "inhaber"
+        ],
+        "operationId": "getInhaber",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:read"
+            ]
+          }
+        ],
+        "description": "Laden eines Inhabers zu einer UUID.\n",
+        "responses": {
+          "200": {
+            "description": "Inhaber geladen\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inhaber"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Laden eines Inhabers\n"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege": {
+      "get": {
+        "tags": [
+          "beleg"
+        ],
+        "summary": "Lesen der Belege",
+        "operationId": "readBelege",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Belege geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Beleg"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "beleg"
+        ],
+        "summary": "Anlegen eines Belegs",
+        "operationId": "createBeleg",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:create"
+            ]
+          }
+        ],
+        "description": "Legt einen neuen Beleg an.\nEs ist möglich die Daten des Beleges auszulassen.\nDiese werden dann automatisch aus der Datei ermittelt und vorgeschlagen,\nmüssen später aber nachbearbeitet werden.\nEin Beleg ohne Datei ist nicht möglich.\nÜber die Importdaten können optional Informationen für den Import mitgegeben werden.\nEs kommt eine UUID für den Inhalt des Belegs zurück.\nÜber die Schnittstelle /importstatus/{inhaltId} kann sich der aktuelle Status des Imports abgerufen werden.\nDer Beleg ist angelegt, sobald der Importstatus eine BelegId enthält.\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Dateiinhalt zu einem Beleg.<br>\nHiermit sind die Binärdaten gemeint.<br>\nEs werden folgende Dateitypen für den Upload unterstützt:<br>\n- .bmp\n- .csv\n- .doc\n- .docx\n- .docm\n- .eml\n- .gif\n- .htm\n- .html\n- .jpeg\n- .jpg\n- .msg\n- .odc\n- .odf\n- .odg\n- .odi\n- .odm\n- .odp\n- .ods\n- .odt\n- .oft\n- .otg\n- .otp\n- .ots\n- .ott\n- .pdf\n- .png\n- .ppt\n- .pptx\n- .tif\n- .tiff\n- .txt\n- .xls\n- .xlsm\n- .xlsx\n- .xml\nEs wird basierend auf dem Inhalt (Magic Bytes) und über den ursprünglichen Dateinamen\n(wenn nicht über Magic Bytes möglich oder uneindeutig) der MIME-Type bestimmt.\nBasierend auf diesem MIME-Type wird geprüft, ob die Datei zulässig ist.\n"
+                  },
+                  "data": {
+                    "$ref": "#/components/schemas/CreateBelegRequest"
+                  },
+                  "importData": {
+                    "$ref": "#/components/schemas/ImportDataRequest"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Der Beleg wurde erfolgreich hochgeladen und wird nun verarbeitet.<br>\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateBelegResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Anlegen eines Belegs\n"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Der Beleg wurde bereits einmal hochgeladen.\nDieser Fehler tritt nur auf, wenn die Dublettenprüfung über das ImportData-Objekt aktiviert wurde.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessageDublette"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Dateityp nicht unterstützt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/count": {
+      "get": {
+        "tags": [
+          "beleg"
+        ],
+        "summary": "Lesen der Anzahl der Belege",
+        "operationId": "countBelege",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Beleganzahl geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountBelegResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/importstatus": {
+      "get": {
+        "tags": [
+          "beleg"
+        ],
+        "summary": "Lesen der aktuellen Importe einer Firma",
+        "operationId": "readImportStatus",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:create"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Importstatus geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ImportStatus"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/importstatus/{inhaltId}": {
+      "get": {
+        "tags": [
+          "beleg"
+        ],
+        "summary": "Lesen des aktuellen Importstatus eines Belegs",
+        "operationId": "getImportStatus",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:create"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Importstatus geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportStatus"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Inhalt wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/heften": {
+      "post": {
+        "summary": "Heften von Belegen",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "heften",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:update"
+            ]
+          }
+        ],
+        "description": "Heftet mehrere einzelne Belege zu einem Beleg zusammen.\nDie Reihenfolge der Belege gibt die Reihenfolge der Seiten des neuen Belegs an.\nEigenbelege können nicht geheftet werden.\nHeften von Eigenbelegen wird mit einem Fehler beantwortet.\nÜber die API ist nicht erkennbar ob es sich bei einem Beleg um einen Eigenbeleg handelt.\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HeftenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Heften erfolgreich\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HeftenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Heften",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Der Benutzer besitzt nicht das nötige Recht zum Heften auf dem PDF-Dokument",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Die Belege konnten nicht geheftet werden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Datensatz ist gesperrt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}": {
+      "get": {
+        "summary": "Abruf eines Belegs",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "getBeleg",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:read"
+            ]
+          }
+        ],
+        "description": "Laden eines Beleges zu der UUID.\n",
+        "responses": {
+          "200": {
+            "description": "Beleg zur Id\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Beleg"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Aktualisieren eines Belegs",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "updateBeleg",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:update"
+            ]
+          }
+        ],
+        "description": "Aktualisieren der Metadaten zu einem Beleg.\nEigenbelege lassen keine Aktualisierung zu und sind nur über ADNOVA+ zu bearbeiten.\nAktualisieren von Eigenbelegen wird mit einem Fehler beantwortet.\nÜber die API ist nicht erkennbar ob es sich bei einem Beleg um einen Eigenbeleg handelt.\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBelegRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Beleg wurde aktualisiert\n"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Beleg ist nicht zu bearbeiten",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Datensatz ist gesperrt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Löschen eines Belegs",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "deleteBeleg",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:delete"
+            ]
+          }
+        ],
+        "description": "Löschen eines Belegs zu der UUID.\n",
+        "responses": {
+          "204": {
+            "description": "Der Beleg wurde erfolgreich gelöscht\n"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Löschen des Belegs nicht möglich"
+          },
+          "423": {
+            "description": "Datensatz ist gesperrt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}/suggestions": {
+      "get": {
+        "summary": "Vorschlagswerte zu einem Beleg",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "getBelegSuggestions",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:read"
+            ]
+          }
+        ],
+        "description": "Laden von Vorschlagswerten zu einem Beleg.",
+        "responses": {
+          "200": {
+            "description": "Vorschlagswerte zu einem Beleg",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BelegSuggestion"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Beleg gefunden, dieser hat aber keine Vorschläge"
+          },
+          "400": {
+            "description": "Fehler wenn es sich bei der UUID um keine gültige UUID handelt"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}/content": {
+      "get": {
+        "summary": "Herunterladen eines Belegs",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "getBelegContent",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:read"
+            ]
+          }
+        ],
+        "description": "Laden einer Datei über die UUID. Wenn der Beleg durch die Texterkennung verarbeitet wurde, so wird die daraus resultierende Datei geladen. Ansonsten wird die Originaldatei (ggf. ohne Text) geladen.",
+        "responses": {
+          "200": {
+            "description": "Inhalt zum Beleg zur Id\n",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Beleg gefunden, dieser hat aber keinen Inhalt"
+          },
+          "400": {
+            "description": "Fehler wenn es sich bei der UUID um keine gültige UUID handelt"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}/content/original": {
+      "get": {
+        "summary": "Herunterladen des Originalbelegs",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "getBelegContentOriginal",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:read"
+            ]
+          }
+        ],
+        "description": "Laden der Originaldatei über die UUID",
+        "responses": {
+          "200": {
+            "description": "Originaler Inhalt zum Beleg zur Id\n",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Beleg gefunden, dieser hat aber keinen Inhalt"
+          },
+          "400": {
+            "description": "Fehler wenn es sich bei der UUID um keine gültige UUID handelt"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}/content/ocr": {
+      "get": {
+        "summary": "Herunterladen des Belegs mit erkanntem Text",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "getBelegContentOcr",
+        "deprecated": true,
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:read"
+            ]
+          }
+        ],
+        "description": "Laden der aus der Texterkennung resultierenden Datei über die UUID.",
+        "responses": {
+          "200": {
+            "description": "Verarbeiteter Inhalt zum Beleg zur Id\n",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Beleg gefunden, dieser hat aber keinen Inhalt aus der Texterkennung"
+          },
+          "400": {
+            "description": "Fehler wenn es sich bei der UUID um keine gültige UUID handelt"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}/content/enhanced": {
+      "get": {
+        "summary": "Herunterladen des Belegs mit erkanntem Text",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "getBelegContentEnhanced",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:read"
+            ]
+          }
+        ],
+        "description": "Laden der aus der Texterkennung resultierenden Datei über die UUID.",
+        "responses": {
+          "200": {
+            "description": "Verarbeiteter Inhalt zum Beleg zur Id\n",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Beleg gefunden, dieser hat aber keinen Inhalt aus der Texterkennung"
+          },
+          "400": {
+            "description": "Fehler wenn es sich bei der UUID um keine gültige UUID handelt"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}/entheften": {
+      "post": {
+        "summary": "Entheften eines Belegs",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "entheften",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:update"
+            ]
+          }
+        ],
+        "description": "Entheftet einen mehrseitigen Beleg in einzelne Belege.\nDie neuen Belege werden neu importiert, damit die Vorschlagswerte ermittelt werden, daher kommen nur neue InhaltIds zurück.\nÜber die Schnittstelle /importstatus/{inhaltId} kann der aktuelle Status des enthefteten Belegs abgerufen werden.\nDer Beleg ist angelegt, sobald der Importstatus eine BelegId enthält.\n",
+        "responses": {
+          "200": {
+            "description": "Beleg wurde entheftet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntheftenResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Der Benutzer besitzt nicht das nötige Recht zum Heften auf dem PDF-Dokument",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Beleg konnte nicht entheftet werden\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Datensatz ist gesperrt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}/move/{destinationInhaberId}": {
+      "post": {
+        "summary": "Verschieben eines Belegs",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "moveBeleg",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:create",
+              "beon:beleg:delete"
+            ]
+          }
+        ],
+        "description": "Verschiebt einen Beleg von einem Inhaber in einen anderen.\n",
+        "responses": {
+          "200": {
+            "description": "Beleg wurde verschoben\n"
+          },
+          "400": {
+            "description": "Fehler beim Verschieben\n"
+          },
+          "403": {
+            "description": "Der Benutzer hat nicht die nötigen Berechtigungen\n"
+          },
+          "404": {
+            "description": "Inhaber oder Beleg nicht gefunden\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Beleg konnte nicht verschoben werden\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Datensatz ist gesperrt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}/reverse": {
+      "post": {
+        "summary": "Stornieren eines Belegs",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "reverseBeleg",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:update"
+            ]
+          }
+        ],
+        "description": "Storniert den Beleg und legt wenn createKorrekturBeleg=true einen Korrekturbeleg an.\nDie UUID des Korrekturbelegs wird zurückgegeben.\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReverseBelegRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Beleg wurde storniert\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReverseBelegResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler bei ungültigen Parametern\nZ.B. wenn es sich bei einer Id um keine gültige UUID handelt\n"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Fehler wenn sich der Beleg nicht stornieren lässt.\n"
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}/stipulate": {
+      "post": {
+        "summary": "Festschreiben eines Belegs",
+        "tags": [
+          "beleg"
+        ],
+        "operationId": "stipulateBeleg",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:update"
+            ]
+          }
+        ],
+        "description": "Schreibt einen Beleg fest.\nHierbei werden Status und Plfichtfelder Berücksichtigt.\nEs wird der Status auf 'festgeschrieben' geändert was den Beleg unveränderlich macht (GoBD).\nGleichzeitig wird dem Beleg eine je Inhaber(Betrieb) eindeutige Nummer zugewiesen.\nDiese muss unveränderlich, eindeutig und lückenlos sein.\nFestgeschrieben werden können Belege die den Status 'bearbeitet' haben\nund bei denen alle Pflichtfelder gefüllt sind.\n",
+        "responses": {
+          "200": {
+            "description": "Beleg wurde festgeschrieben\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StipulateBelegResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler bei ungültigen Parametern\nZ.B. wenn es sich bei einer Id um keine gültige UUID handelt\n"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Fehler wenn sich der Beleg nicht festschreiben lässt.\nHierfür können verschiedene Gründe existieren.\n- Der Beleg ist bereits festgeschrieben\n- Der Status des Belegs lässt kein Festschreiben zu\n- Es sind nicht alle Pflichtfelder im Beleg gefüllt\n"
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/belege/{belegId}/aktionen": {
+      "get": {
+        "summary": "Lesen der Aktionen zu einem Beleg",
+        "tags": [
+          "beleg-aktionen"
+        ],
+        "operationId": "readBelegAktionen",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:read"
+            ]
+          }
+        ],
+        "description": "Zu einem Beleg kann es Aktionen geben, die asynchron ausgeführt werden.\nDieser Endpunkt gibt die Aktionen für diesen Beleg aus.\n",
+        "responses": {
+          "200": {
+            "description": "Beleg-Aktionen geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BelegAktion"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler bei ungültigen Parametern\nZ.B. wenn es sich bei einer Id um keine gültige UUID handelt\n"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber/den Beleg nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Beleg nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/erlaeuterungen": {
+      "get": {
+        "tags": [
+          "erlaeuterung"
+        ],
+        "summary": "Lesen der Erläuterungen",
+        "operationId": "readErlaeuterungen",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Erläuterungen geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Erlaeuterung"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "erlaeuterung"
+        ],
+        "summary": "Erstellen einer neuen Erläuterung",
+        "operationId": "createErlaeuterung",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateErlaeuterungRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Es wurde erfolgreich eine Erläuterung angelegt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateErlaeuterungResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Anlegen einer neuen Erläuterung"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "522": {
+            "description": "Eine Erläuterung mit dieser Bezeichnung existiert bereits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/erlaeuterungen/{erlaeuterungId}": {
+      "get": {
+        "summary": "Laden einer Erläuterung",
+        "tags": [
+          "erlaeuterung"
+        ],
+        "operationId": "getErlaeuterung",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "description": "Laden einer Erläuterung über die Id",
+        "responses": {
+          "200": {
+            "description": "Erläuterung geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erlaeuterung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Laden einer Erläuterung"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Erläuterung wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "erlaeuterung"
+        ],
+        "summary": "Aktualisieren einer Erläuterung",
+        "operationId": "updateErlaeuterung",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "description": "Aktualisiert die Erläuterung",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateErlaeuterungRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Erläuterung wurde aktualisiert"
+          },
+          "400": {
+            "description": "Fehler beim Aktualisieren einer Erläuterung"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Erläuterung wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "erlaeuterung"
+        ],
+        "summary": "Löschen einer Erläuterung",
+        "operationId": "deleteErlaeuterung",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Erläuterung gelöscht"
+          },
+          "400": {
+            "description": "Fehler beim Löschen einer Erläuterung"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Löschen der Erläuterung nicht möglich"
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/freitextPartner": {
+      "get": {
+        "tags": [
+          "freitextPartner"
+        ],
+        "summary": "Lesen der FreitextPartner",
+        "operationId": "readFreitextPartner",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FreitextPartner geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FreitextPartner"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "freitextPartner"
+        ],
+        "summary": "Erstellen eines neuen FreitextPartners",
+        "operationId": "createFreitextPartner",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFreitextPartnerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Es wurde erfolgreich ein FreitextPartner angelegt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFreitextPartnerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Anlegen eines neuen FreitextPartners"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "522": {
+            "description": "Ein FreitextPartner mit dieser Bezeichnung existiert bereits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/freitextPartner/{freitextPartnerId}": {
+      "get": {
+        "summary": "Laden eines FreitextPartners",
+        "tags": [
+          "freitextPartner"
+        ],
+        "operationId": "getFreitextPartner",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "description": "Laden eines FreitextPartners über die Id",
+        "responses": {
+          "200": {
+            "description": "FreitextPartner geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreitextPartner"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Laden eines FreitextPartners"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder FreitextPartner wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "freitextPartner"
+        ],
+        "summary": "Aktualisieren eines FreitextPartners",
+        "operationId": "updateFreitextPartner",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "description": "Aktualisiert den FreitextPartner",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFreitextPartnerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "FreitextPartner wurde aktualisiert"
+          },
+          "400": {
+            "description": "Fehler beim Aktualisieren eines FreitextPartners"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder FreitextPartner wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "freitextPartner"
+        ],
+        "summary": "Löschen eines FreitextPartners",
+        "operationId": "deleteFreitextPartner",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "FreitextPartner gelöscht"
+          },
+          "400": {
+            "description": "Fehler beim Löschen eines FreitextPartners"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Löschen des FreitextPartners nicht möglich"
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/label": {
+      "get": {
+        "tags": [
+          "label"
+        ],
+        "summary": "Lesen der Label",
+        "operationId": "readLabel",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Label geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Label"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Label konnten nicht geladen werden"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "label"
+        ],
+        "summary": "Erstellen eines neuen Labels",
+        "operationId": "createLabel",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLabelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Es wurde erfolgreich ein Label angelegt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateLabelResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Anlegen eines neuen Labels"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "522": {
+            "description": "Ein Label mit dieser Bezeichnung existiert bereits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/label/{labelId}": {
+      "get": {
+        "summary": "Laden eines Labels",
+        "tags": [
+          "label"
+        ],
+        "operationId": "getLabel",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "description": "Laden eines Labels über die UUID",
+        "responses": {
+          "200": {
+            "description": "Label geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Label"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Laden eines Labels"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Label wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "label"
+        ],
+        "summary": "Aktualisieren eines Labels",
+        "operationId": "updateLabel",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "description": "Aktualisiert das Label",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLabelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Label wurde aktualisiert"
+          },
+          "400": {
+            "description": "Fehler beim Aktualisieren eines Labels"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Label wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "label"
+        ],
+        "summary": "Löschen eines Labels",
+        "operationId": "deleteLabel",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Label gelöscht"
+          },
+          "400": {
+            "description": "Fehler beim Löschen eines Labels"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Löschen des Labels nicht möglich"
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/metadaten/oidcClients": {
+      "get": {
+        "tags": [
+          "oidcClients"
+        ],
+        "summary": "Lesen der Oidc Clients über die Belege hochgeladen wurden",
+        "operationId": "readOidcClients",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:beleg:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Oidc Clients geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OidcClient"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Oidc Clients konnten nicht geladen werden"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/ordner": {
+      "get": {
+        "tags": [
+          "ordner"
+        ],
+        "summary": "Lesen der Ordner",
+        "operationId": "readOrdner",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ordner geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ordner"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ordner konnten nicht geladen werden"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ordner"
+        ],
+        "summary": "Erstellen eines neuen Ordners",
+        "operationId": "createOrdner",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrdnerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Es wurde erfolgreich ein Ordner angelegt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateOrdnerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Anlegen eines neuen Ordners"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "522": {
+            "description": "Ein Ordner mit dieser Bezeichnung existiert bereits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/ordner/{ordnerId}": {
+      "get": {
+        "summary": "Laden eines Ordners",
+        "tags": [
+          "ordner"
+        ],
+        "operationId": "getOrdner",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "description": "Laden eines Ordners über die UUID",
+        "responses": {
+          "200": {
+            "description": "Ordner geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ordner"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Laden eines Ordners"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Ordner wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ordner"
+        ],
+        "summary": "Aktualisieren eines Ordners",
+        "operationId": "updateOrdner",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "description": "Aktualisiert den Ordner",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrdnerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ordner wurde aktualisiert"
+          },
+          "400": {
+            "description": "Fehler beim Aktualisieren eines Ordners"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Ordner wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ordner"
+        ],
+        "summary": "Löschen eines Ordners",
+        "operationId": "deleteOrdner",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:manage"
+            ]
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Ordner gelöscht"
+          },
+          "400": {
+            "description": "Fehler beim Löschen eines Ordners"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Löschen des Ordners nicht möglich"
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/stichworte": {
+      "get": {
+        "tags": [
+          "stichwort"
+        ],
+        "summary": "Lesen der Stichworte",
+        "operationId": "readStichworte",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stichworte geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Stichwort"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stichworte konnten nicht geladen werden"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/stichworte/{stichwortId}": {
+      "get": {
+        "summary": "Laden eines Stichworts",
+        "tags": [
+          "stichwort"
+        ],
+        "operationId": "getStichwort",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "description": "Laden eines Stichworts über die UUID",
+        "responses": {
+          "200": {
+            "description": "Stichwort geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stichwort"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Laden eines Stichworts"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Stichwort wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/vorgangsarten": {
+      "get": {
+        "tags": [
+          "vorgangsart"
+        ],
+        "summary": "Lesen der Vorgangsarten",
+        "operationId": "readVorgangsarten",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vorgangsarten geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Vorgangsart"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Vorgangsarten konnten nicht geladen werden"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inhaber/{inhaberId}/vorgangsarten/{vorgangsartId}": {
+      "get": {
+        "summary": "Laden einer Vorgangsart",
+        "tags": [
+          "vorgangsart"
+        ],
+        "operationId": "getVorgangsart",
+        "security": [
+          {
+            "oauth-ld": [
+              "beon:inhaber:stammdaten:read"
+            ]
+          }
+        ],
+        "description": "Laden einer Vorgangsart über die UUID",
+        "responses": {
+          "200": {
+            "description": "Vorgangsart geladen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vorgangsart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehler beim Laden einer Vorgangsart"
+          },
+          "403": {
+            "description": "Der Benutzer besitzt für den Inhaber nicht das nötige Recht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inhaber oder Vorgangsart wurde nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "oauth-ld": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://authentication.landdata.de/auth/realms/landdata/protocol/openid-connect/auth",
+            "tokenUrl": "https://authentication.landdata.de/auth/realms/landdata/protocol/openid-connect/token",
+            "scopes": {
+              "beon:inhaber:read": "Lese Scope auf Inhaber",
+              "beon:beleg:read": "Lese Scope auf Beleg",
+              "beon:beleg:create": "Anlage Scope fuer Belege",
+              "beon:beleg:update": "Aenderungs Scope fuer Belege",
+              "beon:beleg:delete": "Loeschen Scope fuer Belege",
+              "beon:inhaber:stammdaten:read": "Lese Scope auf Stammdaten",
+              "beon:inhaber:stammdaten:manage": "Anlage",
+              "Aenderung und Delete Scope auf Stammdaten": "Aenderung und Delete Scope auf Stammdaten"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "BelegId": {
+        "in": "path",
+        "name": "belegId",
+        "description": "Id die einen Beleg identifiziert.<br>\n",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/BelegId"
+        }
+      },
+      "DestinationInhaberId": {
+        "in": "path",
+        "name": "destinationInhaberId",
+        "description": "Id die einen Inhaber identifiziert.<br>\n",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/InhaberId"
+        }
+      },
+      "ErlaeuterungId": {
+        "in": "path",
+        "name": "erlaeuterungId",
+        "description": "Id die eine Erläuterung identifiziert.<br>\n",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/ErlaeuterungId"
+        }
+      },
+      "FilterBeleg": {
+        "in": "query",
+        "name": "belegFilter",
+        "description": "Objekt für die Filterung von Belegen.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/FilterBeleg"
+        },
+        "explode": true
+      },
+      "FilterErlaeuterung": {
+        "in": "query",
+        "name": "erlaeuterungFilter",
+        "description": "Objekt für die Filterung von Erläuterungen.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/FilterErlaeuterung"
+        },
+        "explode": true
+      },
+      "FilterFreitextPartner": {
+        "in": "query",
+        "name": "freitextPartnerFilter",
+        "description": "Objekt für die Filterung von FreitextPartnern.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/FilterFreitextPartner"
+        },
+        "explode": true
+      },
+      "FilterInhaber": {
+        "in": "query",
+        "name": "inhaberFilter",
+        "description": "Objekt für die Filterung von Inhabern.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/FilterInhaber"
+        },
+        "explode": true
+      },
+      "FilterLabel": {
+        "in": "query",
+        "name": "labelFilter",
+        "description": "Objekt für die Filterung von Labeln.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/FilterLabel"
+        },
+        "explode": true
+      },
+      "FilterOrdner": {
+        "in": "query",
+        "name": "ordnerFilter",
+        "description": "Objekt für die Filterung von Ordnern.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/FilterOrdner"
+        },
+        "explode": true
+      },
+      "FilterStichwort": {
+        "in": "query",
+        "name": "stichwortFilter",
+        "description": "Objekt für die Filterung von Stichworten.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/FilterStichwort"
+        },
+        "explode": true
+      },
+      "FilterVorgangsart": {
+        "in": "query",
+        "name": "vorgangsartFilter",
+        "description": "Objekt für die Filterung von Vorgangsarten.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/FilterVorgangsart"
+        },
+        "explode": true
+      },
+      "FreitextPartnerId": {
+        "in": "path",
+        "name": "freitextPartnerId",
+        "description": "Id die einen FreitextPartner identifiziert.<br>\n",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/FreitextPartnerId"
+        }
+      },
+      "InhaberId": {
+        "in": "path",
+        "name": "inhaberId",
+        "description": "Id die einen Inhaber identifiziert.<br>\n",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/InhaberId"
+        }
+      },
+      "InhaltId": {
+        "in": "path",
+        "name": "inhaltId",
+        "description": "Id die einen Inhalt/Datei identifiziert.<br>\n",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/InhaltId"
+        }
+      },
+      "LabelId": {
+        "in": "path",
+        "name": "labelId",
+        "description": "Id die ein Label identifiziert.<br>\n",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/LabelId"
+        }
+      },
+      "OrdnerId": {
+        "in": "path",
+        "name": "ordnerId",
+        "description": "Id die einen Ordner identifiziert.<br>\n",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/OrdnerId"
+        }
+      },
+      "PageableBeleg": {
+        "in": "query",
+        "name": "belegPageable",
+        "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Belegen.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/PageableBeleg"
+        },
+        "explode": true
+      },
+      "PageableErlaeuterung": {
+        "in": "query",
+        "name": "erlaeuterungPageable",
+        "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Erläuterungen.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/PageableErlaeuterung"
+        },
+        "explode": true
+      },
+      "PageableFreitextPartner": {
+        "in": "query",
+        "name": "freitextPartnerPageable",
+        "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von FreitextPartner.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/PageableFreitextPartner"
+        }
+      },
+      "PageableInhaber": {
+        "in": "query",
+        "name": "inhaberPageable",
+        "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Inhabern.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/PageableInhaber"
+        },
+        "explode": true
+      },
+      "PageableLabel": {
+        "in": "query",
+        "name": "labelPageable",
+        "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Labeln.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/PageableLabel"
+        }
+      },
+      "PageableOrdner": {
+        "in": "query",
+        "name": "ordnerPageable",
+        "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Ordnern.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/PageableOrdner"
+        }
+      },
+      "PageableStichwort": {
+        "in": "query",
+        "name": "stichwortPageable",
+        "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Stichworten.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/PageableStichwort"
+        },
+        "explode": true
+      },
+      "PageableVorgangsart": {
+        "in": "query",
+        "name": "vorgangsartPageable",
+        "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Vorgangsarten.<br>\n",
+        "schema": {
+          "$ref": "#/components/schemas/PageableVorgangsart"
+        }
+      },
+      "StichwortId": {
+        "in": "path",
+        "name": "stichwortId",
+        "description": "Id die ein Stichwort identifiziert.<br>\n",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/StichwortId"
+        }
+      },
+      "VorgangsartId": {
+        "in": "path",
+        "name": "vorgangsartId",
+        "description": "Id die eine Vorgangsart identifziert.<br>\n",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/VorgangsartId"
+        }
+      }
+    },
+    "schemas": {
+      "Ausgangsbeleg": {
+        "description": "Ob sich ein Beleg im Ausgang-Belegbuch befindet<br>\n",
+        "type": "boolean",
+        "nullable": false
+      },
+      "BasePageable": {
+        "description": "Basisobjekt für OffSet und Limit.<br>\n",
+        "type": "object",
+        "properties": {
+          "offset": {
+            "$ref": "#/components/schemas/OffSet"
+          },
+          "limit": {
+            "$ref": "#/components/schemas/Limit"
+          }
+        }
+      },
+      "Beleg": {
+        "description": "Daten eines Belegs\n",
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "id",
+          "erstellt",
+          "geaendert"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/BelegId"
+          },
+          "quellsystemId": {
+            "$ref": "#/components/schemas/QuellsystemId"
+          },
+          "belegbucheinAusgang": {
+            "$ref": "#/components/schemas/BelegbucheinAusgang"
+          },
+          "erstellt": {
+            "$ref": "#/components/schemas/ZeitpunktErstellung"
+          },
+          "geaendert": {
+            "$ref": "#/components/schemas/ZeitpunktAenderung"
+          },
+          "dateigroesse": {
+            "$ref": "#/components/schemas/Dateigroesse"
+          },
+          "dateiname": {
+            "$ref": "#/components/schemas/Dateiname"
+          },
+          "contentType": {
+            "$ref": "#/components/schemas/ContentType"
+          },
+          "seitenanzahl": {
+            "$ref": "#/components/schemas/Seitenanzahl"
+          },
+          "md5": {
+            "$ref": "#/components/schemas/Md5"
+          },
+          "offen": {
+            "$ref": "#/components/schemas/StatusOffen"
+          },
+          "bearbeitet": {
+            "$ref": "#/components/schemas/StatusBearbeitet"
+          },
+          "festgeschrieben": {
+            "$ref": "#/components/schemas/StatusFestgeschrieben"
+          },
+          "storniert": {
+            "$ref": "#/components/schemas/StatusStorniert"
+          },
+          "uploadBuchstelle": {
+            "$ref": "#/components/schemas/BelegUploadBuchstelle"
+          },
+          "nummer": {
+            "$ref": "#/components/schemas/BelegNummer"
+          },
+          "vorgangsart": {
+            "$ref": "#/components/schemas/VorgangsartAuswahl"
+          },
+          "partner": {
+            "$ref": "#/components/schemas/PartnerAuswahl"
+          },
+          "belegDatum": {
+            "$ref": "#/components/schemas/BelegDatum"
+          },
+          "belegJahr": {
+            "$ref": "#/components/schemas/BelegJahr"
+          },
+          "erlaeuterung": {
+            "$ref": "#/components/schemas/ErlaeuterungBezeichnung"
+          },
+          "kommentar": {
+            "$ref": "#/components/schemas/Kommentar"
+          },
+          "betrag": {
+            "$ref": "#/components/schemas/Betrag"
+          },
+          "dauerbeleg": {
+            "$ref": "#/components/schemas/BelegDauerbeleg"
+          },
+          "erkennungsart": {
+            "$ref": "#/components/schemas/Erkennungsart"
+          },
+          "fakturierungsbelegId": {
+            "$ref": "#/components/schemas/FakturierungsbelegId"
+          },
+          "stichworte": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/StichwortAuswahl"
+            }
+          },
+          "label": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/LabelAuswahl"
+            }
+          },
+          "ordner": {
+            "$ref": "#/components/schemas/OrdnerAuswahl"
+          },
+          "dubletten": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/BelegId"
+            }
+          },
+          "oidcClient": {
+            "$ref": "#/components/schemas/OidcClient"
+          },
+          "bankkontoumsatzIds": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/BankkontoumsatzId"
+            }
+          },
+          "aktionen": {
+            "type": "object",
+            "properties": {
+              "exists": {
+                "type": "boolean"
+              },
+              "existsUnfinished": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "BelegAktion": {
+        "description": "Daten einer Beleg-Aktion\n",
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "belegId",
+          "id",
+          "erstellt",
+          "geaendert",
+          "type"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "belegId": {
+            "$ref": "#/components/schemas/BelegId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/BelegAktionId"
+          },
+          "erstellt": {
+            "$ref": "#/components/schemas/ZeitpunktErstellung"
+          },
+          "geaendert": {
+            "$ref": "#/components/schemas/ZeitpunktAenderung"
+          },
+          "finished": {
+            "type": "boolean"
+          },
+          "type": {
+            "type": "string"
+          },
+          "statusMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "BelegbucheinAusgang": {
+        "description": "Enum für die Angabe eines eingehenden oder ausgehenden Belegs.\n",
+        "type": "string",
+        "enum": [
+          "Belegeingang",
+          "Belegausgang"
+        ]
+      },
+      "BelegBank": {
+        "description": "Bankbezeichnung der Zahlung des Belegs",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 60,
+        "example": "Sparkasse KölnBonn"
+      },
+      "BelegBic": {
+        "description": "BIC der Zahlung des Belegs",
+        "type": "string",
+        "format": "bic",
+        "example": "COLSDE33"
+      },
+      "BelegDatum": {
+        "description": "Datum eines Belegs.<br>\nDies kann z.B. das Rechnungsdatum bei einer Rechnung<br>\noder das Angebotsdatum bei einem Angebot sein.<br>\n",
+        "type": "string",
+        "format": "date",
+        "example": "2020-07-27"
+      },
+      "BelegDauerbeleg": {
+        "description": "Handelt es sich bei dem Beleg um einen Dauerbeleg.\n",
+        "type": "boolean",
+        "nullable": false
+      },
+      "BelegFaelligkeitsdatum": {
+        "description": "Datum an dem die Zahlung für den Beleg fällig ist.",
+        "type": "string",
+        "format": "date",
+        "example": "2020-07-27"
+      },
+      "BelegTextfilter": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Stallbau 2022"
+      },
+      "BelegId": {
+        "description": "Id die einen Beleg identifiziert.<br>\n",
+        "type": "string",
+        "format": "uuid",
+        "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
+      },
+      "BelegAktionId": {
+        "description": "Id die eine Beleg-Aktion identifiziert.<br>\n",
+        "type": "string",
+        "format": "uuid",
+        "example": "ad58a18f-092f-45f2-b564-12a982ffce82"
+      },
+      "BankkontoumsatzId": {
+        "description": "Id die einen Bankkontoumsatz identifiziert.<br>\n",
+        "type": "string",
+        "format": "uuid",
+        "example": "c0d0f0bb-b8a2-4c94-9257-9d0bfd5b63f4"
+      },
+      "BelegJahr": {
+        "description": "Das Jahr zu dem der Beleg gehört.<br>\nHiermit ist das Jahr gemeint in dem der Geschäftsvorfall aufgetreten ist.<br>\nSo kann z.B. eine Rechnung im neuen Jahr auf einen Geschäftsvorfall im letzten jahr verweisen.<br>\n",
+        "type": "integer",
+        "format": "int32",
+        "minimum": 1900,
+        "maximum": 2100,
+        "example": 2020
+      },
+      "BelegNummer": {
+        "description": "Nummer eines Belegs.\nWird beim Festschreiben vergeben.\nDie nummer ist sobald sie vergeben ist unveränderlich, lückenlos und eindeutig je Inhaber (Betrieb)\n",
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1,
+        "maximum": 999999999999,
+        "example": 3278
+      },
+      "BelegRechnungsworkflow": {
+        "description": "Workflow eines Belegs mit einer Zahlung, sonst immer abgeschlossen\n",
+        "type": "string",
+        "enum": [
+          "InErfassung",
+          "Ueberweisen",
+          "Abgeschlossen"
+        ]
+      },
+      "BelegSuggestion": {
+        "description": "Vorschlagswerte zu einem Beleg",
+        "type": "object",
+        "properties": {
+          "iban": {
+            "type": "object",
+            "properties": {
+              "suggested": {
+                "$ref": "#/components/schemas/Iban"
+              },
+              "candidates": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Iban"
+                }
+              }
+            }
+          },
+          "verwendungszweck": {
+            "type": "object",
+            "properties": {
+              "suggested": {
+                "$ref": "#/components/schemas/BelegVerwendungszweck"
+              },
+              "candidates": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BelegVerwendungszweck"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BelegUploadBuchstelle": {
+        "description": "Gibt an ob der Beleg von der Buchstelle für einen Mandanten hochgeladen wurde\n",
+        "type": "boolean"
+      },
+      "BelegVerwendungszweck": {
+        "description": "Verwendungszweck der Zahlung des Belegs",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 140,
+        "example": "Rechnungsnummer 1337"
+      },
+      "BelegVolltext": {
+        "description": "Volltextsuche zu einem Beleg",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Lohnfortzahlungsantrag Oktober"
+      },
+      "BelegZahlungsart": {
+        "description": "Zahlungsart der Zahlung zu einem Beleg\n",
+        "type": "string",
+        "enum": [
+          "Lastschrift",
+          "Ueberweisung",
+          "PayPal",
+          "AmazonPayments",
+          "Bar",
+          "Kreditkarte",
+          "Warenwirtschaft"
+        ]
+      },
+      "Benutzer": {
+        "description": "Objekt, dass die Daten eines Benutzers enthält.",
+        "type": "object",
+        "required": [
+          "benutzerId"
+        ],
+        "properties": {
+          "benutzerId": {
+            "$ref": "#/components/schemas/BenutzerId"
+          },
+          "username": {
+            "$ref": "#/components/schemas/Username"
+          }
+        }
+      },
+      "BenutzerId": {
+        "description": "Id die einen Benutzer identifiziert.<br>\n",
+        "type": "string",
+        "format": "uuid",
+        "example": "79d7f8e6-8a98-1033-8c80-e52785c006ae"
+      },
+      "Benutzername": {
+        "description": "Vorname und Nachname des Benutzers.\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Heinz Zuversicht"
+      },
+      "Betrag": {
+        "description": "Betrag des Belegs",
+        "type": "number",
+        "example": 130.76,
+        "minimum": -9999999.99,
+        "maximum": 9999999.99
+      },
+      "BetragFilter": {
+        "description": "(Positiver) Betrag des gesuchten Belegs",
+        "type": "number",
+        "example": 130.76,
+        "minimum": 0,
+        "maximum": 9999999.99
+      },
+      "ContentType": {
+        "description": "MIME-Type\nsiehe https://tools.ietf.org/html/rfc6838#section-4.2\n",
+        "type": "string",
+        "maxLength": 127
+      },
+      "Count": {
+        "description": "Anzahl von Objekten, die gefiltert wurden\n",
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "maximum": 999999999999,
+        "example": 2573
+      },
+      "CountBelegResponse": {
+        "description": "Enthält die Anzahl der gefilterten Belege eines Inhabers.\n",
+        "type": "object",
+        "required": [
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "$ref": "#/components/schemas/Count"
+          }
+        }
+      },
+      "CountZahlungResponse": {
+        "description": "Enthält die Anzahl der gefilterten Zahlungen eines Inhabers.\n",
+        "type": "object",
+        "required": [
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "$ref": "#/components/schemas/Count"
+          }
+        }
+      },
+      "CreateBelegRequest": {
+        "description": "Objekt mit den Daten für das Anlegen eines Belegs.<br>\n",
+        "required": [
+          "vorgangsartId",
+          "partner",
+          "datum",
+          "jahr"
+        ],
+        "type": "object",
+        "properties": {
+          "quellsystemId": {
+            "$ref": "#/components/schemas/QuellsystemId"
+          },
+          "vorgangsartId": {
+            "$ref": "#/components/schemas/VorgangsartId"
+          },
+          "partner": {
+            "$ref": "#/components/schemas/PartnerAuswahl"
+          },
+          "datum": {
+            "$ref": "#/components/schemas/BelegDatum"
+          },
+          "jahr": {
+            "$ref": "#/components/schemas/BelegJahr"
+          },
+          "belegeinAusgang": {
+            "$ref": "#/components/schemas/BelegbucheinAusgang"
+          },
+          "erlaeuterung": {
+            "$ref": "#/components/schemas/ErlaeuterungBezeichnung"
+          },
+          "stichwortIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StichwortId"
+            },
+            "maxItems": 100
+          },
+          "kommentar": {
+            "$ref": "#/components/schemas/Kommentar"
+          },
+          "rechnungsworkflow": {
+            "$ref": "#/components/schemas/BelegRechnungsworkflow"
+          },
+          "zahlungsart": {
+            "$ref": "#/components/schemas/BelegZahlungsart"
+          },
+          "betrag": {
+            "$ref": "#/components/schemas/Betrag"
+          },
+          "zahlungsbetrag": {
+            "$ref": "#/components/schemas/Betrag"
+          },
+          "iban": {
+            "$ref": "#/components/schemas/Iban"
+          },
+          "bic": {
+            "$ref": "#/components/schemas/BelegBic"
+          },
+          "bankbezeichnung": {
+            "$ref": "#/components/schemas/BelegBank"
+          },
+          "verwendungszweck": {
+            "$ref": "#/components/schemas/BelegVerwendungszweck"
+          },
+          "faelligkeitsdatum": {
+            "$ref": "#/components/schemas/BelegFaelligkeitsdatum"
+          },
+          "labelIds": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/LabelId"
+            }
+          },
+          "ordnerId": {
+            "$ref": "#/components/schemas/OrdnerId"
+          }
+        }
+      },
+      "CreateBelegResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/BelegId"
+          }
+        }
+      },
+      "CreateErlaeuterungRequest": {
+        "description": "Daten die zu einer Erlaeuterung angelegt werden sollen.",
+        "type": "object",
+        "required": [
+          "bezeichnung"
+        ],
+        "properties": {
+          "bezeichnung": {
+            "$ref": "#/components/schemas/ErlaeuterungBezeichnung"
+          }
+        }
+      },
+      "CreateErlaeuterungResponse": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ErlaeuterungId"
+          }
+        }
+      },
+      "CreateFakturierungsbelegRequest": {
+        "description": "Objekt mit den Daten für das Festschreiben eines Fakturierungsbelegs.<br>\n",
+        "required": [
+          "betriebId",
+          "benutzer",
+          "fakturierungsbeleg"
+        ],
+        "type": "object",
+        "properties": {
+          "betriebId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "benutzer": {
+            "$ref": "#/components/schemas/Benutzer"
+          },
+          "fakturierungsbeleg": {
+            "$ref": "#/components/schemas/Fakturierungsbeleg"
+          }
+        }
+      },
+      "CreateFakturierungsbelegResponse": {
+        "type": "object",
+        "required": [
+          "belegId"
+        ],
+        "properties": {
+          "belegId": {
+            "$ref": "#/components/schemas/BelegId"
+          }
+        }
+      },
+      "CreateFreitextPartnerRequest": {
+        "description": "Daten die zu einem FreitextPartner angelegt werden sollen.",
+        "type": "object",
+        "required": [
+          "bezeichnung"
+        ],
+        "properties": {
+          "bezeichnung": {
+            "$ref": "#/components/schemas/PartnerBezeichnung"
+          }
+        }
+      },
+      "CreateFreitextPartnerResponse": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/FreitextPartnerId"
+          }
+        }
+      },
+      "CreateLabelRequest": {
+        "description": "Daten die zu einem Label angelegt werden sollen.",
+        "type": "object",
+        "required": [
+          "bezeichnung"
+        ],
+        "properties": {
+          "bezeichnung": {
+            "$ref": "#/components/schemas/LabelBezeichnung"
+          }
+        }
+      },
+      "CreateLabelResponse": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/LabelId"
+          }
+        }
+      },
+      "CreateOrdnerRequest": {
+        "description": "Daten die zu einem Ordner angelegt werden sollen.",
+        "type": "object",
+        "required": [
+          "bezeichnung"
+        ],
+        "properties": {
+          "bezeichnung": {
+            "$ref": "#/components/schemas/OrdnerBezeichnung"
+          }
+        }
+      },
+      "CreateOrdnerResponse": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/OrdnerId"
+          }
+        }
+      },
+      "Dateigroesse": {
+        "description": "Größe einer Datei in Byte\n",
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "example": 534
+      },
+      "Dateiname": {
+        "description": "Name einer Datei\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Beispieldatei.pdf"
+      },
+      "Eingangsbeleg": {
+        "description": "Ob sich ein Beleg im Eingang-Belegbuch befindet<br>\n",
+        "type": "boolean",
+        "nullable": false
+      },
+      "EntheftenResponse": {
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "inhaltIds"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "inhaltIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InhaltId"
+            }
+          }
+        }
+      },
+      "Erkennungsart": {
+        "description": "Gibt an mit welcher Art die Vorschlagswerte für den Beleg ermittelt wurden.\n",
+        "type": "string",
+        "enum": [
+          "Keine",
+          "Wiedererkennung",
+          "VollText",
+          "Zugferd",
+          "QrCode",
+          "Outlook",
+          "Fakturierung",
+          "XRechnung",
+          "FakturierungPortal"
+        ]
+      },
+      "Erlaeuterung": {
+        "description": "Erläuterung zu einem Beleg.<br>\n",
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "id",
+          "bezeichnung"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/ErlaeuterungId"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/ErlaeuterungBezeichnung"
+          }
+        }
+      },
+      "ErlaeuterungId": {
+        "description": "Id der Erlaeuterung",
+        "type": "string",
+        "format": "uuid",
+        "example": "7451432c-db6d-47ad-a71e-ee9720d5639a"
+      },
+      "ErlaeuterungBezeichnung": {
+        "description": "String der Erlaeuterung",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "example": "Fahrtkostenerstattung"
+      },
+      "ErrorMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ErrorMessageDublette": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "dubletten": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/BelegId"
+            }
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ExportConfiguration": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      },
+      "FakturierungsbelegId": {
+        "description": "Uuid die auf den dazugehörigen Fakturierungsbeleg verweist",
+        "type": "string",
+        "format": "uuid",
+        "example": "97e170fd-8c50-496e-a0ac-c77111822d88"
+      },
+      "Fakturierungsbeleg": {
+        "description": "Objekt mit den Daten eines Belegs, welcher zu einem Fakturierungsbeleg-Portal gehört.",
+        "type": "object",
+        "required": [
+          "id",
+          "vorgangsart",
+          "partner",
+          "datum",
+          "betrag",
+          "rechnungsnummer"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/FakturierungsbelegId"
+          },
+          "vorgangsart": {
+            "$ref": "#/components/schemas/Standardvorgangsart"
+          },
+          "partner": {
+            "$ref": "#/components/schemas/PartnerBezeichnung"
+          },
+          "datum": {
+            "$ref": "#/components/schemas/BelegDatum"
+          },
+          "betrag": {
+            "$ref": "#/components/schemas/Betrag"
+          },
+          "rechnungsnummer": {
+            "$ref": "#/components/schemas/Rechnungsnummer"
+          }
+        }
+      },
+      "FilterBeleg": {
+        "description": "Enthält die Filterkriterien, mit Hilfe derer Belege gesucht/gefiltert werden.<br>\n",
+        "type": "object",
+        "properties": {
+          "offen": {
+            "$ref": "#/components/schemas/StatusOffen"
+          },
+          "bearbeitet": {
+            "$ref": "#/components/schemas/StatusBearbeitet"
+          },
+          "festgeschrieben": {
+            "$ref": "#/components/schemas/StatusFestgeschrieben"
+          },
+          "storniert": {
+            "$ref": "#/components/schemas/StatusStorniert"
+          },
+          "uploadBuchstelle": {
+            "$ref": "#/components/schemas/BelegUploadBuchstelle"
+          },
+          "datumVon": {
+            "$ref": "#/components/schemas/BelegDatum"
+          },
+          "datumBis": {
+            "$ref": "#/components/schemas/BelegDatum"
+          },
+          "erstelltVon": {
+            "$ref": "#/components/schemas/BelegDatum"
+          },
+          "erstelltBis": {
+            "$ref": "#/components/schemas/BelegDatum"
+          },
+          "jahrVon": {
+            "$ref": "#/components/schemas/BelegJahr"
+          },
+          "jahrBis": {
+            "$ref": "#/components/schemas/BelegJahr"
+          },
+          "faelligkeitsdatumVon": {
+            "$ref": "#/components/schemas/BelegFaelligkeitsdatum"
+          },
+          "faelligkeitsdatumBis": {
+            "$ref": "#/components/schemas/BelegFaelligkeitsdatum"
+          },
+          "nummerVon": {
+            "$ref": "#/components/schemas/BelegNummer"
+          },
+          "nummerBis": {
+            "$ref": "#/components/schemas/BelegNummer"
+          },
+          "betragVon": {
+            "$ref": "#/components/schemas/BetragFilter"
+          },
+          "betragBis": {
+            "$ref": "#/components/schemas/BetragFilter"
+          },
+          "zahlungsbetragVon": {
+            "$ref": "#/components/schemas/BetragFilter"
+          },
+          "zahlungsbetragBis": {
+            "$ref": "#/components/schemas/BetragFilter"
+          },
+          "vorgangsartId": {
+            "deprecated": true,
+            "$ref": "#/components/schemas/VorgangsartId"
+          },
+          "vorgangsartIds": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/VorgangsartId"
+            }
+          },
+          "partnerBezeichnung": {
+            "$ref": "#/components/schemas/PartnerBezeichnung"
+          },
+          "erlaeuterungBezeichnung": {
+            "$ref": "#/components/schemas/ErlaeuterungBezeichnung"
+          },
+          "stichwortIds": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/StichwortId"
+            }
+          },
+          "zahlungsart": {
+            "$ref": "#/components/schemas/BelegZahlungsart"
+          },
+          "iban": {
+            "$ref": "#/components/schemas/Iban"
+          },
+          "verwendungszweck": {
+            "$ref": "#/components/schemas/BelegVerwendungszweck"
+          },
+          "kommentar": {
+            "$ref": "#/components/schemas/Kommentar"
+          },
+          "volltext": {
+            "$ref": "#/components/schemas/BelegVolltext"
+          },
+          "excludeBelege": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/BelegId"
+            }
+          },
+          "onlyBelege": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/BelegId"
+            }
+          },
+          "dublettenOnly": {
+            "type": "boolean",
+            "default": false
+          },
+          "contentType": {
+            "$ref": "#/components/schemas/ContentType"
+          },
+          "textfilter": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "$ref": "#/components/schemas/BelegTextfilter"
+            }
+          },
+          "textFilterVerodern": {
+            "description": "Sollen die Texte in der Suche verodert werden?",
+            "type": "boolean",
+            "default": false
+          },
+          "oidcClients": {
+            "description": "Uuids der Oidc Clients auf die gefiltert werden soll",
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "eingangsbeleg": {
+            "$ref": "#/components/schemas/Eingangsbeleg"
+          },
+          "ausgangsbeleg": {
+            "$ref": "#/components/schemas/Ausgangsbeleg"
+          },
+          "erkennungsart": {
+            "type": "array",
+            "maxItems": 9,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "FilterErlaeuterung": {
+        "description": "Enthält die Filterkriterien, mit Hilfe derer Erläuterungen gesucht/gefiltert werden.<br>\n",
+        "type": "object",
+        "properties": {
+          "bezeichnungContains": {
+            "type": "string"
+          },
+          "bezeichnungStartsWith": {
+            "type": "string"
+          }
+        }
+      },
+      "FilterFreitextPartner": {
+        "description": "Enthält die Filterkriterien, mit Hilfe derer FreitextPartner gesucht/gefiltert werden.<br>\n",
+        "type": "object",
+        "properties": {
+          "bezeichnungContains": {
+            "type": "string"
+          },
+          "bezeichnungStartsWith": {
+            "type": "string"
+          }
+        }
+      },
+      "FilterInhaber": {
+        "description": "Enthält die Filterkriterien, mit Hilfe derer Inhaber gesucht/gefiltert werden.<br>\n",
+        "type": "object",
+        "properties": {
+          "nummerContains": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nummerStartsWith": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "bezeichnungContains": {
+            "type": "string"
+          },
+          "bezeichnungStartsWith": {
+            "type": "string"
+          }
+        }
+      },
+      "FilterLabel": {
+        "description": "Enthält die Filterkriterien, mit Hilfe derer Label gesucht/gefiltert werden.<br>\n",
+        "type": "object",
+        "properties": {
+          "bezeichnungContains": {
+            "$ref": "#/components/schemas/LabelBezeichnung"
+          },
+          "bezeichnungStartsWith": {
+            "$ref": "#/components/schemas/LabelBezeichnung"
+          }
+        }
+      },
+      "FilterOrdner": {
+        "description": "Enthält die Filterkriterien, mit Hilfe derer Ordner gesucht/gefiltert werden.<br>\n",
+        "type": "object",
+        "properties": {
+          "bezeichnungContains": {
+            "$ref": "#/components/schemas/OrdnerBezeichnung"
+          },
+          "bezeichnungStartsWith": {
+            "$ref": "#/components/schemas/OrdnerBezeichnung"
+          }
+        }
+      },
+      "FilterStichwort": {
+        "description": "Enthält die Filterkriterien, mit Hilfe derer Stichworte gesucht/gefiltert werden.<br>\n",
+        "type": "object",
+        "properties": {
+          "bezeichnungContains": {
+            "$ref": "#/components/schemas/StichwortBezeichnung"
+          },
+          "bezeichnungStartsWith": {
+            "$ref": "#/components/schemas/StichwortBezeichnung"
+          }
+        }
+      },
+      "FilterVorgangsart": {
+        "description": "Enthält die Filterkriterien, mit Hilfe derer Vorgangsarten gesucht/gefiltert werden.<br>\n",
+        "type": "object",
+        "properties": {
+          "einfach": {
+            "description": "Sollen einfache Vorgangsarten zurück gegeben werden?<br>\n",
+            "type": "boolean"
+          },
+          "erweitert": {
+            "description": "Sollen erwetierte Vorgangsarten zurück gegeben werden?<br>\n",
+            "type": "boolean"
+          },
+          "standard": {
+            "description": "Sollen Stardardvorgangsarten zurück gegeben werden?<br>\n",
+            "type": "boolean"
+          },
+          "nummerContains": {
+            "$ref": "#/components/schemas/VorgangsartNummer"
+          },
+          "nummerStartsWith": {
+            "$ref": "#/components/schemas/VorgangsartNummer"
+          },
+          "bezeichnungContains": {
+            "$ref": "#/components/schemas/VorgangsartBezeichnung"
+          },
+          "bezeichnungStartsWith": {
+            "$ref": "#/components/schemas/VorgangsartBezeichnung"
+          }
+        }
+      },
+      "FreitextPartner": {
+        "description": "Im Belegbuch freieingegebener Partner.<br>\nEs wird die eingegebene Partnerbezeichnung als String gespeichert.<br>\n",
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "id",
+          "bezeichnung"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/FreitextPartnerId"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/PartnerBezeichnung"
+          }
+        }
+      },
+      "FreitextPartnerId": {
+        "description": "Id die einen FreitextPartner identifiziert.<br>\n",
+        "type": "string",
+        "format": "uuid",
+        "example": "e6d94ecf-1fca-421e-b908-d1d2c8a13952"
+      },
+      "HeftenResponse": {
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "id"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/BelegId"
+          }
+        }
+      },
+      "HeftenRequest": {
+        "description": "Objekt für das Heften von Belegen.<br>\n",
+        "type": "object",
+        "required": [
+          "belegIds"
+        ],
+        "properties": {
+          "belegIds": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/BelegId"
+            }
+          }
+        }
+      },
+      "Iban": {
+        "description": "IBAN eines Bankkontos",
+        "type": "string",
+        "format": "iban",
+        "maxLength": 32,
+        "example": "DE15370501980000001115"
+      },
+      "ImportBelegRequest": {
+        "description": "Objekt für das Importieren eines Beleges für einen Mandanten.<br>\n",
+        "type": "object",
+        "required": [
+          "partnerNummer"
+        ],
+        "properties": {
+          "partnerNummer": {
+            "$ref": "#/components/schemas/InhaberNummer"
+          }
+        }
+      },
+      "ImportDataRequest": {
+        "description": "Objekt für weitere optionale Informationen zum Belegimport.\n",
+        "type": "object",
+        "properties": {
+          "belegeinAusgang": {
+            "$ref": "#/components/schemas/BelegbucheinAusgang"
+          },
+          "quellsystemId": {
+            "$ref": "#/components/schemas/QuellsystemId"
+          },
+          "dublettenCheck": {
+            "description": "Soll der Upload mit Dublettenprüfung durchgeführt werden?",
+            "type": "boolean"
+          }
+        }
+      },
+      "ImportStatusResponse": {
+        "description": "Objekt für die Importstatus\n",
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/ImportStatus"
+            }
+          }
+        }
+      },
+      "ImportStatus": {
+        "description": "Objekt für die Daten zu einem aktuellen Import.\n",
+        "type": "object",
+        "required": [
+          "inhaltId",
+          "statusText",
+          "dateiname"
+        ],
+        "properties": {
+          "inhaltId": {
+            "$ref": "#/components/schemas/InhaltId"
+          },
+          "statusText": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "Beleg hochgeladen"
+          },
+          "importDone": {
+            "type": "boolean"
+          },
+          "dateiname": {
+            "$ref": "#/components/schemas/Dateiname"
+          },
+          "belegId": {
+            "$ref": "#/components/schemas/BelegId"
+          }
+        }
+      },
+      "Inhaber": {
+        "description": "Daten eines Inhabers/Betriebs.\n",
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "bezeichnung"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "nummer": {
+            "$ref": "#/components/schemas/InhaberNummer"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/InhaberBezeichnung"
+          },
+          "betriebsnummer": {
+            "$ref": "#/components/schemas/InhaberBetriebsnummer"
+          },
+          "geschaeftstaetigkeit": {
+            "$ref": "#/components/schemas/InhaberGeschaeftstaetigkeit"
+          },
+          "exportConfigurations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExportConfiguration"
+            }
+          }
+        }
+      },
+      "InhaberBetriebsnummer": {
+        "description": "Betriebsnummer eines Inhabers",
+        "type": "integer",
+        "format": "int32",
+        "minimum": 1,
+        "maximum": 999999999,
+        "example": 200
+      },
+      "InhaberBezeichnung": {
+        "description": "Bezeichnung eines Inhabers.\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "example": "Heinz Zuversicht"
+      },
+      "InhaberGeschaeftstaetigkeit": {
+        "description": "Geschaeftstaetigkeit",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 25,
+        "example": "Photovoltaik"
+      },
+      "InhaberId": {
+        "description": "Id eines Inhabers\n",
+        "type": "string",
+        "format": "uuid",
+        "example": "ba8aff9e-5a96-4024-9c29-5a3710132053"
+      },
+      "InhaberNummer": {
+        "description": "Nummer eines Inhabers.\n",
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1,
+        "maximum": 999999999999,
+        "example": 200
+      },
+      "InhaltId": {
+        "description": "Id eines Beleginhalts (Content)\n",
+        "type": "string",
+        "format": "uuid",
+        "example": "ce9be6ec-e27a-4856-b5be-ee496715f573"
+      },
+      "InternalBelegStatus": {
+        "type": "object",
+        "properties": {
+          "inhaltId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "importDone": {
+            "type": "boolean"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "scanQuality": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "status": {
+            "type": "string"
+          },
+          "belegId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nummer": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasErrors": {
+            "type": "boolean"
+          }
+        }
+      },
+      "InternalCreateRequest": {
+        "type": "object",
+        "properties": {
+          "belegbuchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "qrCodeContent": {
+            "type": "string"
+          },
+          "nummer": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "InternalCreateResponse": {
+        "type": "object",
+        "properties": {
+          "inhaltId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "InternalPartnerSuggestion": {
+        "type": "object",
+        "properties": {
+          "bezeichnung": {
+            "type": "string"
+          }
+        }
+      },
+      "Kommentar": {
+        "description": "Kommentar zu einem Objekt.<br>\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000,
+        "example": "Hydraulikschlauch für Forstzange, Gelenkwelle für Güllefass"
+      },
+      "Label": {
+        "description": "Label für Filterung/Gruppierung von Belegen.<br>\n",
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "id",
+          "bezeichnung"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/LabelId"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/LabelBezeichnung"
+          }
+        }
+      },
+      "LabelAuswahl": {
+        "description": "Label das zu einem Beleg zugeordnet ist.<br>\n",
+        "type": "object",
+        "required": [
+          "id",
+          "bezeichnung"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/LabelId"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/LabelBezeichnung"
+          }
+        }
+      },
+      "LabelId": {
+        "description": "Id eines Labels.",
+        "type": "string",
+        "format": "uuid",
+        "example": "7451432c-db6d-47ad-a71e-ee9720d5639a"
+      },
+      "LabelBezeichnung": {
+        "description": "Bezeichnung eines Labels.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "example": "Steuern"
+      },
+      "Limit": {
+        "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
+        "type": "integer",
+        "format": "int32",
+        "default": 20,
+        "minimum": 1,
+        "maximum": 100,
+        "example": 15
+      },
+      "Md5": {
+        "description": "MD5 Hashwert\n32-stellige Hexadezimalzahl\n",
+        "type": "string",
+        "minLength": 32,
+        "maxLength": 32
+      },
+      "OffSet": {
+        "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
+        "type": "integer",
+        "format": "int64",
+        "default": 0,
+        "minimum": 0,
+        "example": 100
+      },
+      "OidcClient": {
+        "description": "Informationen zum Client über den ein Beleg hochgeladen wurde.",
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "description": "Generierte uuid für den Client.",
+            "type": "string",
+            "format": "uuid",
+            "example": "16f37169-71ce-4955-bc9a-86cfc5569d5c"
+          },
+          "bezeichnung": {
+            "description": "Name des Client zum Anzeigen in der UI.",
+            "type": "string",
+            "maxLength": 100,
+            "example": "Just Farming Portal"
+          }
+        }
+      },
+      "Ordner": {
+        "description": "Ordner für die Gruppierung von Belegen.<br>\n",
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "id",
+          "bezeichnung"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/OrdnerId"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/OrdnerBezeichnung"
+          }
+        }
+      },
+      "OrdnerAuswahl": {
+        "description": "Ordner der zu einem Beleg zugeordnet ist.<br>\n",
+        "type": "object",
+        "required": [
+          "id",
+          "bezeichnung"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/OrdnerId"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/OrdnerBezeichnung"
+          }
+        }
+      },
+      "OrdnerId": {
+        "description": "Id eines Ordners.",
+        "type": "string",
+        "format": "uuid",
+        "example": "16f37169-71ce-4955-bc9a-86cfc5569d5c"
+      },
+      "OrdnerBezeichnung": {
+        "description": "Bezeichnung eines Ordners.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "example": "Rechnungen"
+      },
+      "PageableBeleg": {
+        "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Belegen an.<br>\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePageable"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sorting": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "ERSTELLTASC",
+                    "ERSTELLTDESC",
+                    "GEAENDERTASC",
+                    "GEAENDERTDESC",
+                    "DATUMASC",
+                    "DATUMDESC",
+                    "JAHRASC",
+                    "JAHRDESC",
+                    "NUMMERASC",
+                    "NUMMERDESC",
+                    "DATEIGROESSEASC",
+                    "DATEIGROESSEDESC",
+                    "BETRAGASC",
+                    "BETRAGDESC",
+                    "ZAHLUNGSBETRAGASC",
+                    "ZAHLUNGSBETRAGDESC",
+                    "VORGANGSARTASC",
+                    "VORGANGSARTDESC",
+                    "PARTNERBEZEICHNUNGASC",
+                    "PARTNERBEZEICHNUNGDESC",
+                    "ERLAEUTERUNGASC",
+                    "ERLAEUTERUNGDESC",
+                    "IBANASC",
+                    "IBANDESC",
+                    "VERWENDUNGSZWECKASC",
+                    "VERWENDUNGSZWECKDESC",
+                    "FAELLIGKEITSDATUMASC",
+                    "FAELLIGKEITSDATUMDESC",
+                    "DAUERBELEGASC",
+                    "DAUERBELEGDESC",
+                    "UPLOADBUCHSTELLEASC",
+                    "UPLOADBUCHSTELLEDESC",
+                    "BELEGBUCHASC",
+                    "BELEGBUCHDESC",
+                    "STATUSASC",
+                    "STATUSDESC",
+                    "KOMMENTARASC",
+                    "KOMMENTARDESC"
+                  ]
+                },
+                "default": [
+                  "ERSTELLTDESC"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "PageableErlaeuterung": {
+        "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Erläuterungen an.<br>\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePageable"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sorting": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "BEZEICHNUNGASC",
+                    "BEZEICHNUNGDESC"
+                  ]
+                },
+                "default": [
+                  "BEZEICHNUNGASC"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "PageableFreitextPartner": {
+        "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von FreitextPartnern an.<br>\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePageable"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sorting": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "BEZEICHNUNGASC",
+                    "BEZEICHNUNGDESC"
+                  ]
+                },
+                "default": [
+                  "BEZEICHNUNGASC"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "PageableInhaber": {
+        "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Inhabern an.<br>\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePageable"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sorting": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "BEZEICHNUNGASC",
+                    "BEZEICHNUNGDESC",
+                    "NUMMERASC",
+                    "NUMMERDESC"
+                  ]
+                },
+                "default": [
+                  "NUMMERASC"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "PageableLabel": {
+        "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Labeln an.<br>\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePageable"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sorting": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "BEZEICHNUNGASC",
+                    "BEZEICHNUNGDESC"
+                  ]
+                },
+                "default": [
+                  "BEZEICHNUNGASC"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "PageableOrdner": {
+        "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Ordnern an.<br>\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePageable"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sorting": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "BEZEICHNUNGASC",
+                    "BEZEICHNUNGDESC"
+                  ]
+                },
+                "default": [
+                  "BEZEICHNUNGASC"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "PageableStichwort": {
+        "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Stichworten an.<br>\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePageable"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sorting": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "BEZEICHNUNGASC",
+                    "BEZEICHNUNGDESC"
+                  ]
+                },
+                "default": [
+                  "BEZEICHNUNGASC"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "PageableVorgangsart": {
+        "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Vorgangsarten an.<br>\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePageable"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sorting": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "NUMMERASC",
+                    "NUMMERDESC",
+                    "BEZEICHNUNGASC",
+                    "BEZEICHNUNGDESC"
+                  ]
+                },
+                "default": [
+                  "NUMMERASC"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "PartnerBezeichnung": {
+        "description": "Bezeichnung eines Partners.<br>\nDies kann die Bezeichnung eines Partners aus den Stammdaten sein<br>\noder eine Freitexteingabe, zu der es keinen partner in den Stammdaten gibt.<br>\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 70,
+        "example": "Landwirtschaftskammer"
+      },
+      "PartnerAuswahl": {
+        "description": "partner der zu einem Beleg ausgewählt wurde.<br>\nBei einer Partnerauswahl muss entweder die Id oder die Bezeichnung gefüllt sein.<br>\nEine Id steht hierbei für einen Partner aus den Stammdaten.<br>\nEine Bezeichnung steht für eine Freitexteingabe, zu der es keinen Partner in den Stammdaten gibt.<br>\n",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/PartnerId"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/PartnerBezeichnung"
+          }
+        }
+      },
+      "PartnerId": {
+        "description": "Id die einen Stammdatenpartner identifiziert.<br>\n",
+        "type": "string",
+        "format": "uuid",
+        "example": "u7f04evf-4fca-421e-f123-c2c1f8a42960"
+      },
+      "QuellsystemId": {
+        "description": "Id eines Datensatzes wenn er aus einem externen System importiert wurde.<br>\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Adnova+"
+      },
+      "Rechnungsnummer": {
+        "description": "Rechnungsnummer eines Belegs.",
+        "type": "string",
+        "maxLength": 15,
+        "example": "R-2025-1337"
+      },
+      "ReverseBelegRequest": {
+        "description": "Objekt mit den Daten für das Stornieren eines festgeschriebenen Belegs.<br>\n",
+        "type": "object",
+        "required": [
+          "createKorrekturBeleg"
+        ],
+        "properties": {
+          "createKorrekturBeleg": {
+            "description": "Soll ein Korrekturbeleg erstellt werden?\n",
+            "type": "boolean",
+            "default": true,
+            "example": true
+          }
+        }
+      },
+      "ReverseBelegResult": {
+        "description": "Enthält die UUID des Korrekturbelegs.\n",
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "id"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/BelegId"
+          }
+        }
+      },
+      "ReverseFakturierungsbelegRequest": {
+        "description": "Objekt mit den Daten für das Festschreiben eines Fakturierungsbelegs.<br>\n",
+        "required": [
+          "betriebId",
+          "benutzer",
+          "stornoFakturierungsbelegId",
+          "fakturierungsbeleg"
+        ],
+        "type": "object",
+        "properties": {
+          "betriebId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "benutzer": {
+            "$ref": "#/components/schemas/Benutzer"
+          },
+          "stornoFakturierungsbelegId": {
+            "$ref": "#/components/schemas/FakturierungsbelegId"
+          },
+          "fakturierungsbeleg": {
+            "$ref": "#/components/schemas/Fakturierungsbeleg"
+          }
+        }
+      },
+      "ReverseFakturierungsbelegResponse": {
+        "type": "object",
+        "required": [
+          "belegId"
+        ],
+        "properties": {
+          "belegId": {
+            "$ref": "#/components/schemas/BelegId"
+          }
+        }
+      },
+      "Seitenanzahl": {
+        "description": "Anzahl der Seiten eines Belegs\n",
+        "type": "integer",
+        "example": 7
+      },
+      "Standardablageort": {
+        "description": "Enum für die standardisierten Ablageorte\n",
+        "type": "string",
+        "x-enum-varnames": [
+          "GrundUndBoden",
+          "GrundUndBodenEntnahme",
+          "GrundUndBodenFlurbereinigung",
+          "GrundUndBodenSonstiges",
+          "GrundUndBodenVertraege",
+          "GrundUndBodenVerzeichnisse",
+          "Rechnungswesen",
+          "RechnungswesenAllgemein",
+          "RechnungswesenFinanzbuchhaltung",
+          "RechnungswesenJahresabschluss",
+          "Steuern",
+          "SteuernAktenvermerk",
+          "SteuernAllgemein",
+          "SteuernBetriebspruefungen",
+          "SteuernEinheitsbewertung",
+          "SteuernEinkommensteuer",
+          "SteuernErbschaftSchenkungsteuer",
+          "SteuernGesonderteUndEinheitlicheFeststellung",
+          "SteuernGewerbesteuer",
+          "SteuernGrundGrunderwerbsteuer",
+          "SteuernKoerperschaftsteuer",
+          "SteuernLohnsteuer",
+          "SteuernUmsatzsteuer",
+          "Vertraege",
+          "VertraegeGesellschaftsvertraege",
+          "VertraegeHofpachtvertraege",
+          "VertraegeMietPachtvertraege",
+          "VertraegeSonstiges",
+          "VertraegeUebergabevertraege"
+        ],
+        "enum": [
+          "Grund und Boden",
+          "Entnahme",
+          "Flurbereinigung",
+          "Grund und Boden Sonstiges",
+          "Grund und Boden Verträge",
+          "Verzeichnisse",
+          "Rechnungswesen",
+          "Rechnungswesen Allgemein",
+          "Finanzbuchhaltung",
+          "Jahresabschluss",
+          "Steuern",
+          "Aktenvermerk",
+          "Steuern Allgemein",
+          "Betriebsprüfungen",
+          "Einheitsbewertung",
+          "Einkommensteuer",
+          "Erbschaft-/Schenkungsteuer",
+          "Gesonderte und einheitliche Feststellung",
+          "Gewerbesteuer",
+          "Grund-/Grunderwerbsteuer",
+          "Köperschaftsteuer",
+          "Lohnsteuer",
+          "Umsatzsteuer",
+          "Verträge",
+          "Gesellschaftsverträge",
+          "Hofpachtverträge",
+          "Mietpachtverträe",
+          "Verträge Sonstiges",
+          "Übergabeverträge"
+        ]
+      },
+      "Standardvorgangsart": {
+        "enum": [
+          "Angebot",
+          "Auftrag",
+          "Lieferschein",
+          "Rechnung",
+          "Gutschrift",
+          "Sonstiges",
+          "Vertrag",
+          "Kontoauszug",
+          "Mahnung",
+          "Protokoll"
+        ]
+      },
+      "StatusBearbeitet": {
+        "description": "Status des Belegs, nachdem er Bearbeitet wurde.<br>\n",
+        "type": "boolean",
+        "nullable": false
+      },
+      "StatusFestgeschrieben": {
+        "description": "Status des Belegs, wenn er entgültig archiviert wurde.<br>\n",
+        "type": "boolean",
+        "nullable": false
+      },
+      "StatusOffen": {
+        "description": "Status des Belegs, nach dem Import.<br>\n",
+        "type": "boolean",
+        "nullable": false
+      },
+      "StatusStorniert": {
+        "description": "Status des Belegs, wenn die Festschreibung fehlerhaft war.<br>\n",
+        "type": "boolean",
+        "nullable": false
+      },
+      "Stichwort": {
+        "description": "Daten zu einem Stichwort.<br>\n",
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "id",
+          "bezeichnung"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/StichwortId"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/StichwortBezeichnung"
+          }
+        }
+      },
+      "StichwortAuswahl": {
+        "description": "Stichwort die zu einem Beleg ausgewählt werden kann.<br>\n",
+        "type": "object",
+        "required": [
+          "id",
+          "bezeichnung"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/StichwortId"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/StichwortBezeichnung"
+          }
+        }
+      },
+      "StichwortBezeichnung": {
+        "description": "Bezeichnung eines Stichworts.<br>\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "example": "Tierwohl"
+      },
+      "StichwortId": {
+        "description": "Id die ein Stichwort aus den Stammdaten identifiziert.<br>\n",
+        "type": "string",
+        "format": "uuid",
+        "example": "6285a675-24a8-4001-931f-3e6f83ddcc1b"
+      },
+      "StipulateBelegResult": {
+        "description": "Ergebnis beim Festschreiben eines Belegs\n",
+        "type": "object",
+        "properties": {
+          "nummer": {
+            "$ref": "#/components/schemas/BelegNummer"
+          }
+        }
+      },
+      "UpdateBelegRequest": {
+        "type": "object",
+        "required": [
+          "belegeinAusgang",
+          "vorgangsartId",
+          "partner",
+          "datum",
+          "jahr"
+        ],
+        "properties": {
+          "belegeinAusgang": {
+            "$ref": "#/components/schemas/BelegbucheinAusgang"
+          },
+          "vorgangsartId": {
+            "$ref": "#/components/schemas/VorgangsartId"
+          },
+          "partner": {
+            "$ref": "#/components/schemas/PartnerAuswahl"
+          },
+          "datum": {
+            "$ref": "#/components/schemas/BelegDatum"
+          },
+          "jahr": {
+            "$ref": "#/components/schemas/BelegJahr"
+          },
+          "erlaeuterung": {
+            "$ref": "#/components/schemas/ErlaeuterungBezeichnung"
+          },
+          "stichwortIds": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/StichwortId"
+            }
+          },
+          "kommentar": {
+            "$ref": "#/components/schemas/Kommentar"
+          },
+          "betrag": {
+            "$ref": "#/components/schemas/Betrag"
+          },
+          "dauerbeleg": {
+            "$ref": "#/components/schemas/BelegDauerbeleg"
+          },
+          "labelIds": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/LabelId"
+            }
+          },
+          "ordnerId": {
+            "$ref": "#/components/schemas/OrdnerId"
+          }
+        }
+      },
+      "UpdateErlaeuterungRequest": {
+        "type": "object",
+        "required": [
+          "bezeichnung"
+        ],
+        "properties": {
+          "bezeichnung": {
+            "$ref": "#/components/schemas/ErlaeuterungBezeichnung"
+          }
+        }
+      },
+      "UpdateFreitextPartnerRequest": {
+        "type": "object",
+        "required": [
+          "bezeichnung"
+        ],
+        "properties": {
+          "bezeichnung": {
+            "$ref": "#/components/schemas/PartnerBezeichnung"
+          }
+        }
+      },
+      "UpdateLabelRequest": {
+        "type": "object",
+        "required": [
+          "bezeichnung"
+        ],
+        "properties": {
+          "bezeichnung": {
+            "$ref": "#/components/schemas/LabelBezeichnung"
+          }
+        }
+      },
+      "UpdateOrdnerRequest": {
+        "type": "object",
+        "required": [
+          "bezeichnung"
+        ],
+        "properties": {
+          "bezeichnung": {
+            "$ref": "#/components/schemas/OrdnerBezeichnung"
+          }
+        }
+      },
+      "Username": {
+        "description": "Benutzerkennung vorwiegend E-Mail-Adresse eines Benutzers.",
+        "type": "string",
+        "example": "heinz.zuversicht@landdata.de"
+      },
+      "Vorgangsart": {
+        "description": "Daten zu einer Vorgangsart",
+        "type": "object",
+        "required": [
+          "inhaberId",
+          "id",
+          "nummer",
+          "bezeichnung",
+          "vorgangsarttyp"
+        ],
+        "properties": {
+          "inhaberId": {
+            "$ref": "#/components/schemas/InhaberId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/VorgangsartId"
+          },
+          "nummer": {
+            "$ref": "#/components/schemas/VorgangsartNummer"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/VorgangsartBezeichnung"
+          },
+          "vorgangsarttyp": {
+            "$ref": "#/components/schemas/Vorgangsarttyp"
+          }
+        }
+      },
+      "VorgangsartAuswahl": {
+        "description": "Vorgangsart die zu einem Beleg ausgewählt wurde.\n",
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "bezeichnung"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/VorgangsartId"
+          },
+          "nummer": {
+            "$ref": "#/components/schemas/VorgangsartNummer"
+          },
+          "bezeichnung": {
+            "$ref": "#/components/schemas/VorgangsartBezeichnung"
+          }
+        }
+      },
+      "VorgangsartBezeichnung": {
+        "description": "Bezeichnung der Vorgangsart",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "example": "Rechnung"
+      },
+      "VorgangsartId": {
+        "description": "Id der Vorgangsart",
+        "type": "string",
+        "format": "uuid",
+        "example": "b6ccf73b-b472-4f2a-911d-81a3d31cdfab"
+      },
+      "VorgangsartNummer": {
+        "description": "Nummer der Vorgangsart",
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1,
+        "maximum": 999999999999,
+        "example": 4
+      },
+      "Vorgangsarttyp": {
+        "description": "Typ der Vorgangsart. Einfache Vorgangsarten dienen zur Ablage im Dokumentenmanagement.\nErweiterte Vorgangsarten dienen zum Ein-/Austragen von Fristen und Terminen.\nStandardvorgangsarten geben den Typ eines Belegs an z.B. Rechnung.\n",
+        "type": "string",
+        "enum": [
+          "Einfach",
+          "Erweitert",
+          "Standard"
+        ]
+      },
+      "ZeitpunktErstellung": {
+        "description": "Zeitpunkt zu den ein Datensatz erstellt wurde.<br>\n",
+        "type": "string",
+        "format": "date-time",
+        "example": "2020-08-12T09:12:17.074000"
+      },
+      "ZeitpunktAenderung": {
+        "description": "Zeitpunkt zu den ein Datensatz zuletzt geändert wurde.<br>\n",
+        "type": "string",
+        "format": "date-time",
+        "example": "2020-09-15T13:54:01.396000"
+      }
+    }
+  }
+}

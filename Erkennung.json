@@ -1,0 +1,1208 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Erkennung",
+    "description": "API für die Erkennung",
+    "contact": {
+      "name": "Just Farming GmbH",
+      "url": "https://www.just-farming.de/",
+      "email": "info@just-farming.de"
+    },
+    "version": "0.0.2-SNAPSHOT"
+  },
+  "servers": [
+    {
+      "url": "https://api.adnova.de/erkennung-service",
+      "description": "Umgebung Produktion"
+    },
+    {
+      "url": "https://api-wart.adnova.de/erkennung-service",
+      "description": "Umgebung Staging"
+    },
+    {
+      "url": "https://api-dev.adnova.de/test/erkennung-service",
+      "description": "Umgebung Test"
+    }
+  ],
+  "tags": [
+    {
+      "name": "erkennung",
+      "description": "Tag für die Erkennungsschnittstelle"
+    }
+  ],
+  "paths": {
+    "/api/v1/files": {
+      "post": {
+        "tags": [
+          "erkennung"
+        ],
+        "summary": "Einreihen einer Datei für die Analyse",
+        "operationId": "submitFile",
+        "description": "Die Datei wird hier initial an den Erkennung-Service übergeben.\nDieser reiht die Datei in die Warteschlange ein und löst anschließend\nden Erkennungsprozess aus.\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "file": {
+                  "contentType": "application/pdf"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Datei wurde erfolgreich in die Analyse eingereiht",
+            "headers": {
+              "RateLimit-Limit": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitLimit"
+                }
+              },
+              "RateLimit-Remaining": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitRemaining"
+                }
+              },
+              "RateLimit-Policy": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitPolicy"
+                }
+              },
+              "RateLimit-Reset": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitReset"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitFileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datei fehlt im Request"
+          },
+          "413": {
+            "description": "Die Größe der Datei überschreitet 50 MB"
+          },
+          "415": {
+            "description": "Datei ist keine PDF Datei"
+          }
+        }
+      }
+    },
+    "/api/v1/files/{fileId}/result": {
+      "get": {
+        "tags": [
+          "erkennung"
+        ],
+        "summary": "Abrufen der Ergebnisse der Analyse",
+        "operationId": "getResult",
+        "description": "Nachdem die Datei hochgeladen und erfolgreich erkannt wurde,\nkönnen hiermit die ermittelten Daten abgerufen werden.\n",
+        "responses": {
+          "200": {
+            "description": "Ermittelte Daten erfolgreich abgerufen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileAnalysisResults"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Id ist keine gültige UUID"
+          },
+          "404": {
+            "description": "Zu der Id wurden keine Daten gefunden.\nDies ist auch der Fall, wenn noch keine Daten vorliegen\noder die Daten abgelaufen sind.\n"
+          }
+        }
+      }
+    },
+    "/api/v1/files/{fileId}": {
+      "get": {
+        "tags": [
+          "erkennung"
+        ],
+        "summary": "Abrufen der zu analysierenden Datei",
+        "operationId": "getContent",
+        "description": "Hier kann die urspünglich zu analysierende Datei abgerufen werden.\n",
+        "responses": {
+          "200": {
+            "description": "Abruf der Originaldatei erfolgreich",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string",
+                  "example": "attachment; filename=\"example.pdf\""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Id ist keine gültige UUID"
+          },
+          "404": {
+            "description": "Zu der Id wurde keine Datei gefunden"
+          }
+        }
+      }
+    },
+    "/api/v1/files/{fileId}/ocr": {
+      "get": {
+        "tags": [
+          "erkennung"
+        ],
+        "summary": "Abrufen der mit Text versehenen Datei",
+        "operationId": "getContentOcr",
+        "description": "Nachdem die Datei hochgeladen und erfolgreich erkannt wurde,\nkann diese hier mit eingefügtem OCR-Text heruntergeladen werden.\n",
+        "responses": {
+          "200": {
+            "description": "Abruf der Datei mit OCR erfolgreich",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string",
+                  "example": "attachment; filename=\"example.pdf\""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Id ist keine gültige UUID"
+          },
+          "404": {
+            "description": "Zu der Id wurde keine Datei gefunden.\nDies ist auch der Fall, wenn noch keine Datei mit OCR vorliegt\noder die Datei abgelaufen ist.\n"
+          }
+        }
+      }
+    },
+    "/api/v1/files/{fileId}/status": {
+      "get": {
+        "tags": [
+          "erkennung"
+        ],
+        "summary": "Status der Datei bei der Analyse",
+        "operationId": "getStatus",
+        "description": "Ruft den aktuellen Status der Datei in der Analyse ab.\n",
+        "responses": {
+          "200": {
+            "description": "Dateistatus erfolgreich abgerufen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusFileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Id ist keine gültige UUID"
+          },
+          "404": {
+            "description": "Zu der Id wurde keine Datei gefunden.\nDies ist auch der Fall, wenn die Datei abgelaufen ist.\n"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "oidc-ld-prod": [
+        "jf:api:beleg-daten-erkennung"
+      ]
+    },
+    {
+      "oidc-ld-staging": [
+        "jf:api:beleg-daten-erkennung"
+      ]
+    },
+    {
+      "oidc-ld-test": [
+        "jf:api:beleg-daten-erkennung"
+      ]
+    },
+    {
+      "oidc-ld-dev": [
+        "jf:api:beleg-daten-erkennung"
+      ]
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "oidc-ld-prod": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "authorizationUrl": "https://authentication.landdata.de/auth/realms/landdata/protocol/openid-connect/auth",
+            "tokenUrl": "https://authentication.landdata.de/auth/realms/landdata/protocol/openid-connect/token",
+            "scopes": {
+              "jf:api:beleg-daten-erkennung": "Durchführung Beleg-Daten-Erkennung"
+            }
+          }
+        }
+      },
+      "oidc-ld-staging": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "authorizationUrl": "https://authentication-wart.intern.landdata.de/auth/realms/landdata/protocol/openid-connect/auth",
+            "tokenUrl": "https://authentication-wart.intern.landdata.de/auth/realms/landdata/protocol/openid-connect/token",
+            "scopes": {
+              "jf:api:beleg-daten-erkennung": "Durchführung Beleg-Daten-Erkennung"
+            }
+          }
+        }
+      },
+      "oidc-ld-test": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "authorizationUrl": "https://authentication-dev.landdata.de/auth/realms/landdata/protocol/openid-connect/auth",
+            "tokenUrl": "https://authentication-dev.landdata.de/auth/realms/landdata/protocol/openid-connect/token",
+            "scopes": {
+              "jf:api:beleg-daten-erkennung": "Durchführung Beleg-Daten-Erkennung"
+            }
+          }
+        }
+      },
+      "oidc-ld-dev": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "authorizationUrl": "https://authentication-dev.landdata.de/auth/realms/landdata/protocol/openid-connect/auth",
+            "tokenUrl": "https://authentication-dev.landdata.de/auth/realms/landdata/protocol/openid-connect/token",
+            "scopes": {
+              "jf:api:beleg-daten-erkennung": "Durchführung Beleg-Daten-Erkennung"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "FileId": {
+        "name": "fileId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/FileId"
+        }
+      }
+    },
+    "schemas": {
+      "RateLimitLimit": {
+        "description": "the server's quota for requests by the client in the time window",
+        "type": "number",
+        "format": "int64"
+      },
+      "RateLimitRemaining": {
+        "description": "the remaining quota in the current window",
+        "type": "number",
+        "format": "int64"
+      },
+      "RateLimitPolicy": {
+        "description": "the quota policy",
+        "type": "string"
+      },
+      "RateLimitReset": {
+        "description": "the time remaining in the current window, specified in seconds",
+        "type": "number",
+        "format": "int64"
+      },
+      "AdresseDetails": {
+        "type": "object",
+        "properties": {
+          "addresseeByCountry": {
+            "type": "string"
+          },
+          "addresseeByZip": {
+            "type": "string"
+          },
+          "adresse": {
+            "type": "string"
+          },
+          "adresstyp": {
+            "type": "string"
+          },
+          "adresszusatz": {
+            "type": "string"
+          },
+          "allin": {
+            "type": "string"
+          },
+          "anrede": {
+            "type": "string"
+          },
+          "anschrift1": {
+            "type": "string"
+          },
+          "anschrift2": {
+            "type": "string"
+          },
+          "bis": {
+            "type": "string"
+          },
+          "bundesland": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "firma": {
+            "type": "string"
+          },
+          "gebaeudeLabel": {
+            "type": "string"
+          },
+          "gebaeudeNr": {
+            "type": "string"
+          },
+          "geo": {
+            "type": "string"
+          },
+          "hausnr": {
+            "type": "string"
+          },
+          "land": {
+            "type": "string"
+          },
+          "landKnz": {
+            "type": "string"
+          },
+          "ort": {
+            "type": "string"
+          },
+          "ortKorrigiertAuf": {
+            "type": "string"
+          },
+          "ortKorrigiertVon": {
+            "type": "string"
+          },
+          "otIndikator": {
+            "type": "string"
+          },
+          "otName": {
+            "type": "string"
+          },
+          "pfIndikator": {
+            "type": "string"
+          },
+          "plz": {
+            "type": "string"
+          },
+          "plzGuessedBy": {
+            "type": "string"
+          },
+          "plzKorrigiertAuf": {
+            "type": "string"
+          },
+          "plzKorrigiertVon": {
+            "type": "string"
+          },
+          "postfachnr": {
+            "type": "string"
+          },
+          "rechtsform": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "strasse": {
+            "type": "string"
+          },
+          "titel": {
+            "type": "string"
+          },
+          "town": {
+            "type": "string"
+          },
+          "von": {
+            "type": "string"
+          },
+          "zipCode": {
+            "type": "string"
+          }
+        }
+      },
+      "AdresseExtraction": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdresseProperty"
+            }
+          },
+          "suggested": {
+            "$ref": "#/components/schemas/AdresseProperty"
+          }
+        }
+      },
+      "AdresseProperty": {
+        "type": "object",
+        "properties": {
+          "details": {
+            "$ref": "#/components/schemas/AdresseDetails"
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueProperty"
+          }
+        ]
+      },
+      "BetragExtraction": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BetragProperty"
+            }
+          },
+          "suggested": {
+            "$ref": "#/components/schemas/BetragProperty"
+          }
+        }
+      },
+      "BetragProperty": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueProperty"
+          }
+        ]
+      },
+      "Created": {
+        "description": "Erstellungszeitpunkt der Datei.   \n\nZeitpunkt an dem die Datei der Erkennung übergeben wurde.\n",
+        "type": "string",
+        "format": "date-time",
+        "example": "2022-02-09T21:54:13.619679+00:00"
+      },
+      "Done": {
+        "type": "boolean",
+        "description": "Gibt an, ob die Erkennung abgeschlossen ist oder nicht.   \n\nHierbei wird nur ausgegeben ob die Analyse noch läuft oder nicht.   \nEin Rückschluss auf Erfolg oder Fehler ist nicht möglich.   \nHierzu siehe `error`\n"
+      },
+      "EmailDetails": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "subdomain": {
+            "type": "string"
+          },
+          "tld": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          }
+        }
+      },
+      "EmailExtraction": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmailProperty"
+            }
+          },
+          "suggested": {
+            "$ref": "#/components/schemas/EmailProperty"
+          }
+        }
+      },
+      "EmailProperty": {
+        "type": "object",
+        "properties": {
+          "details": {
+            "$ref": "#/components/schemas/EmailDetails"
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueProperty"
+          }
+        ]
+      },
+      "Error": {
+        "type": "boolean",
+        "description": "Gibt an, ob bei der Erkennung ein Fehler aufgetreten ist.   \n\nSind während der Erkennung Fehler aufgetreten, ist der Wert `true` gesetzt.   \nDer Wert ist erst nach der abgeschlossenen Analyse vorhanden.   \n\nWenn bei der Erkennung ein Fehler aufgetreten ist, ist zu erwarten das **keine** Werte erkannt wurden.   \nIn Außnahmefällen können trotzdem erkannte Werte vorhanden sein.\n"
+      },
+      "Expiration": {
+        "description": "Ablaufzeitpunkt der Datei.   \n\nNachdem die Analyse abgeschlossen wurde, sind die Datei und die Ergebnisse für eine gewisse Dauer abrufbar.   \nWie lange ist über dieses Feld abzulesen.   \nNach dem Ablaufzeitpunkt sind die Datei und die Ergebnisse nicht mehr abrufbar.   \n\nDer Wert ist erst nach der abgeschlossenen Analye vorhanden.\n",
+        "type": "string",
+        "format": "date-time",
+        "example": "2022-02-16T21:54:18.828949+00:00"
+      },
+      "Extractions": {
+        "type": "object",
+        "properties": {
+          "abrechnungNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "adressNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "adresse": {
+            "$ref": "#/components/schemas/AdresseExtraction"
+          },
+          "aktenzeichen": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "angebotNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "auftragNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "auftragbestNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "auftraggeberNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "beitragNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "belegDatum": {
+            "$ref": "#/components/schemas/ValueExtraction"
+          },
+          "belegDatumVonBis": {
+            "$ref": "#/components/schemas/ValueExtraction"
+          },
+          "belegNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "bescheidNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "bestellNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "betrag": {
+            "$ref": "#/components/schemas/BetragExtraction"
+          },
+          "betriebNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "bic": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "bzl": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "bonNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "debitorNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "email": {
+            "$ref": "#/components/schemas/EmailExtraction"
+          },
+          "genregNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "geschaeftsZeiten": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "glaeubigerId": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "globaleLokationsNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "gutschriftNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "hndlregNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "iban": {
+            "$ref": "#/components/schemas/ValueExtraction"
+          },
+          "ihreZeichen": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "kartenNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "kassenzeichen": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "kontoNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "kontoauszugNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "kontraktNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "krankenversicherungNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "kreditorNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "kundenKto": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "kundenNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "lulDatum": {
+            "$ref": "#/components/schemas/LulDatumExtraction"
+          },
+          "lieferantNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "lieferscheinNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "lieferungNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "mandantNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "mandatreferenzNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "mitgliedNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "nummerVerwaist": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "objektNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "orgNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "paidFlag": {
+            "$ref": "#/components/schemas/ValueExtraction"
+          },
+          "partnerNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "policeNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "projektNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "qsId": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "rechnungDatum": {
+            "$ref": "#/components/schemas/RechnungDatumExtraction"
+          },
+          "rechnungNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "rechnungskorrekturNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "referenzNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "registrierNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "reklamationNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "reservierungNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "schadenNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "steuerNr": {
+            "$ref": "#/components/schemas/SteuerNrExtraction"
+          },
+          "telefaxNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "telefonNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "telefonfaxNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "toPayFlag": {
+            "$ref": "#/components/schemas/ValueExtraction"
+          },
+          "unsereZeichen": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "unternehmensId": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "url": {
+            "$ref": "#/components/schemas/UrlExtraction"
+          },
+          "ust": {
+            "$ref": "#/components/schemas/UstExtraction"
+          },
+          "ustIdNumber": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "versicherungNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "vertragKontoNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "vertragNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "verwendungszweck": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "vorgangNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "vvvoNr": {
+            "$ref": "#/components/schemas/KeyValueExtraction"
+          },
+          "zahlungsart": {
+            "$ref": "#/components/schemas/ValueExtraction"
+          }
+        }
+      },
+      "FileAnalysisResults": {
+        "type": "object",
+        "properties": {
+          "scanQuality": {
+            "$ref": "#/components/schemas/ScanQuality"
+          },
+          "pageCount": {
+            "$ref": "#/components/schemas/PageCount"
+          },
+          "extractions": {
+            "$ref": "#/components/schemas/Extractions"
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/StatusFileResponse"
+          }
+        ],
+        "description": "Ergebnisse der Analyse einer Datei.   \n\nEnthält die Ergebnisse der Analyse der Datei.   \nZusätzlich sind auch Statusinforamtionen enthalten.\n"
+      },
+      "FileId": {
+        "description": "Id, die eine Datei identifiziert.   \n\nDie Id wird beim Hochladen einer Datei vergeben.   \nUnter der Id sind der Status und die Ergebnisse der Analyse abrufbar.\n",
+        "type": "string",
+        "format": "uuid",
+        "example": "130a4311-c3a2-4870-bada-583b7c6ce5a0"
+      },
+      "Filename": {
+        "description": "Name der Datei.   \n\nIst nur gefüllt, wenn er auch beim Hochladen der Datei mitgesendet wurde.\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Beispieldatei.pdf"
+      },
+      "Finished": {
+        "description": "Abschlusszeitpunkt der Datei.   \n\nZeitpunkt an dem die Analsyse der Datei abgeschlossen wurde.   \nDer Wert ist erst nach der abgeschlossenen Analyse vorhanden.\n",
+        "type": "string",
+        "format": "date-time",
+        "example": "2022-02-09T21:54:18.828949+00:00"
+      },
+      "KeyValueExtraction": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyValueProperty"
+            }
+          },
+          "suggested": {
+            "$ref": "#/components/schemas/KeyValueProperty"
+          }
+        }
+      },
+      "KeyValueProperty": {
+        "type": "object",
+        "properties": {
+          "keyCaptured": {
+            "type": "string"
+          },
+          "keyConditioned": {
+            "type": "string"
+          },
+          "keyValueCaptured": {
+            "type": "string"
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueProperty"
+          }
+        ]
+      },
+      "LulDatumDetails": {
+        "type": "object",
+        "properties": {
+          "ab": {
+            "type": "string"
+          },
+          "bis": {
+            "type": "string"
+          }
+        }
+      },
+      "LulDatumExtraction": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LulDatumProperty"
+            }
+          },
+          "suggested": {
+            "$ref": "#/components/schemas/LulDatumProperty"
+          }
+        }
+      },
+      "LulDatumProperty": {
+        "type": "object",
+        "properties": {
+          "details": {
+            "$ref": "#/components/schemas/LulDatumDetails"
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/KeyValueProperty"
+          }
+        ]
+      },
+      "PageCount": {
+        "description": "Anzahl der Seiten einer Datei.   \n\nDie Seitenanzahl ist nur bei Dateitypen mit Seiten verfügbar.   \nDer Wert ist erst nach der abgeschlossenen Analyse vorhanden.\n",
+        "type": "integer",
+        "minimum": 0,
+        "example": 5
+      },
+      "RechnungDatumExtraction": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RechnungDatumProperty"
+            }
+          },
+          "suggested": {
+            "$ref": "#/components/schemas/RechnungDatumProperty"
+          }
+        }
+      },
+      "RechnungDatumProperty": {
+        "type": "object",
+        "properties": {
+          "details": {
+            "$ref": "#/components/schemas/RechnungDatumDetails"
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueProperty"
+          }
+        ]
+      },
+      "RechnungDatumDetails": {
+        "type": "object",
+        "properties": {
+          "ab": {
+            "type": "string"
+          }
+        }
+      },
+      "ScanQuality": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100,
+        "example": 98.75,
+        "description": "Angabe der Scan-Qualität in Prozent.   \n\nDer Wert ist erst nach der abgeschlossenen Analyse vorhanden.\n\nGibt an inwieweit der textuelle Inhalt der Datei OCR-technisch erfasst werden kann.   \nDer Wert beschreibt somit wie gut der Inhalt für den Folgeprozess nutzbar ist.   \nEine Höhere Scan-Qualität sorgt für mehr und besser erkannte Werte.   \n\nVerschiedene Dinge können sich negativ auf den Wert auswirken.   \nNeben einem wirklich schlechten Scan (schief, zu geringe Auflösung, Bildartefakte, ...)   \nwirken sich handschriftliche Ergänzungen negativ aus.   \n\nBei nicht gescannten, rein digitalen Dateien, können sich Nicht-Textinthalte negativ auf den Wert auswirken.   \nHier verfälschen insbesondere Logos und sonstige Grafiken den Score negativ,   \nda diese nicht als Text erkannt werden können.\n"
+      },
+      "StatusFileResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "done",
+          "created"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/FileId"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusMessage"
+          },
+          "done": {
+            "$ref": "#/components/schemas/Done"
+          },
+          "error": {
+            "$ref": "#/components/schemas/Error"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Created"
+          },
+          "finished": {
+            "$ref": "#/components/schemas/Finished"
+          },
+          "expiration": {
+            "$ref": "#/components/schemas/Expiration"
+          },
+          "filename": {
+            "$ref": "#/components/schemas/Filename"
+          }
+        },
+        "description": "Status einer Datei.   \n\nDies betrifft den Status während der Analyse, ggf. Fehler und die Abrufbarkeit von Datei und Ergebnissen.\n"
+      },
+      "StatusMessage": {
+        "type": "string",
+        "description": "Textuelle Beschreibung des letzten Verarbeitungsschritts bei der Erkennung.   \n\nDie Beschreibung ist dafür gedacht eine grobe Übersicht über den Status der Erkennung zu bekommen.   \nDer Inhalt und der Aufbau des Inhalts folgt keinen Regeln.   \nEs sollten **keine Annahmen** basierend aus **vergangenen Werten** bzgl. **zukünftiger Werte geschlossen** werden,   \nda sich diese **jederzeit ändern** können.\n"
+      },
+      "SteuerNrExtraction": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SteuerNrProperty"
+            }
+          },
+          "suggested": {
+            "$ref": "#/components/schemas/SteuerNrProperty"
+          }
+        }
+      },
+      "SteuerNrProperty": {
+        "type": "object",
+        "properties": {
+          "validatedBy": {
+            "type": "string"
+          },
+          "valueValidIn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/KeyValueProperty"
+          }
+        ]
+      },
+      "SubmitFileResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/FileId"
+          }
+        },
+        "description": "Antwort zum Hochladen einer Datei.   \n\nEnthält alle Daten mit der Datei weiter zu interagieren.\n"
+      },
+      "UrlDetails": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": "string"
+          },
+          "pathFile": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "subdomain": {
+            "type": "string"
+          },
+          "tld": {
+            "type": "string"
+          }
+        }
+      },
+      "UrlExtraction": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UrlProperty"
+            }
+          },
+          "suggested": {
+            "$ref": "#/components/schemas/UrlProperty"
+          }
+        }
+      },
+      "UrlProperty": {
+        "type": "object",
+        "properties": {
+          "details": {
+            "$ref": "#/components/schemas/UrlDetails"
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueProperty"
+          }
+        ]
+      },
+      "UstDetails": {
+        "type": "object",
+        "properties": {
+          "bruttoBetrag": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "nettoBetrag": {
+            "type": "string"
+          },
+          "przSatz": {
+            "type": "string"
+          },
+          "przString": {
+            "type": "string"
+          },
+          "ustBetrag": {
+            "type": "string"
+          }
+        }
+      },
+      "UstExtraction": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UstProperty"
+            }
+          },
+          "suggested": {
+            "$ref": "#/components/schemas/UstProperty"
+          }
+        }
+      },
+      "UstProperty": {
+        "type": "object",
+        "properties": {
+          "valueBruttoBetrag": {
+            "type": "string"
+          },
+          "valueCurrency": {
+            "type": "string"
+          },
+          "valueNettoBetrag": {
+            "type": "string"
+          },
+          "valuePrzSatz": {
+            "type": "string"
+          },
+          "valuePrzString": {
+            "type": "string"
+          },
+          "valueUstBetrag": {
+            "type": "string"
+          },
+          "details": {
+            "$ref": "#/components/schemas/UstDetails"
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueProperty"
+          }
+        ]
+      },
+      "ValueExtraction": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValueProperty"
+            }
+          },
+          "suggested": {
+            "$ref": "#/components/schemas/ValueProperty"
+          }
+        }
+      },
+      "ValueProperty": {
+        "type": "object",
+        "properties": {
+          "valueCaptured": {
+            "type": "string"
+          },
+          "valueConditioned": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

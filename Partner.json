@@ -1,0 +1,3155 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Partner",
+    "version": "1.3.2",
+    "description": "Eine API zum Importieren, Aktualisieren und Lesen von Partnern in ADNOVA+. Es können die Partnertypen Kunde, Lieferant und Mandant \nangelegt werden. Mandanten können zudem aktualisiert werden. Es können sowohl Partner in der eigenen Organisation, als auch Partner im Unternehmen eines Mandanten \nangelegt werden. Zum Anlegen eines Partners müssen alle benötigten Pflichtangaben mitgeschickt werden. An zusätzlichen \nAngaben können noch Informationen zur Steuernummer mit angelegt werden. Weiterhin können alle Partner ausgelesen werden,\nauf die der Benutzer Zugriffsrechte besitzt.\n"
+  },
+  "servers": [
+    {
+      "url": "https://api.adnova.de/partner-service",
+      "description": "Umgebungen Produktion (Echtdaten)."
+    },
+    {
+      "url": "https://api-wart.adnova.de/partner-service",
+      "description": "Umgebungen Test (Kopie Echtdaten) nur über VPN erreichbar."
+    },
+    {
+      "url": "https://api-dev.adnova.de/fnktnext/partner-service",
+      "description": "Umgebungen Entwicklung (Testdaten) nur über VPN erreichbar."
+    }
+  ],
+  "tags": [
+    {
+      "name": "Partner anlegen",
+      "description": "Funktionen zum Anlegen eines Partners."
+    },
+    {
+      "name": "Partner lesen",
+      "description": "Funktionen zum Lesen von Partnern."
+    },
+    {
+      "name": "Partner aktualisieren",
+      "description": "Funktionen zum Update von Partnern."
+    },
+    {
+      "name": "Firmen",
+      "description": "Funktionen für Firmen."
+    },
+    {
+      "name": "Geschaeftspartner",
+      "description": "Funktionen für Geschäftspartner."
+    },
+    {
+      "name": "Partnergruppen",
+      "description": "Funktionen für Partnergruppen."
+    },
+    {
+      "name": "Anreden",
+      "description": "Funktionen für Anreden und Briefanreden."
+    },
+    {
+      "name": "Offene Posten Verwaltung",
+      "description": "Anlage von Partnern speziell für die Offene Posten Verwaltung."
+    }
+  ],
+  "paths": {
+    "/api/v1/benutzer/{benutzerId}/partner/opv/kunde": {
+      "post": {
+        "summary": "Import eines Kunden für die Offene Posten Verwaltung",
+        "tags": [
+          "Offene Posten Verwaltung"
+        ],
+        "description": "Importiert einen neuen Kunden für die die Offene Posten Verwaltung in der eigenen Organisation in ADNOVA+.",
+        "operationId": "addKundeOPV",
+        "security": [
+          {
+            "service-to-service-oauth": [
+              "import:partner:manage"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartnerOffenePostenVerwaltungCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Kunde wurde erfolgreich angelegt.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Daten zum Anlegen eines Partners fehlen:\n- Ein Pflichtfeld wurde nicht gefüllt.\n- Ein referenzierter Datensatz existiert nicht.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt beim Anlegen eines Partners:\n- Ein Logisch gelöschter Datensatz wurde versucht zuzuordnen.\n- Ein Datensatz existiert bereits.\n- Keine Berechtigung Partner anzulegen.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/benutzer/{benutzerId}/betrieb/{betriebsnummer}/partner/opv/kunde": {
+      "post": {
+        "summary": "Import eines Kunden für die Offene Posten Verwaltung",
+        "tags": [
+          "Offene Posten Verwaltung"
+        ],
+        "description": "Importiert einen neuen Kunden für die die Offene Posten Verwaltung in dem Unternehmen eines Mandanten der eigenen Organisation.",
+        "operationId": "addKundeOPVForMandant",
+        "security": [
+          {
+            "service-to-service-oauth": [
+              "import:partner:manage"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartnerOffenePostenVerwaltungCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Kunde wurde erfolgreich angelegt.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Daten zum Anlegen eines Partners fehlen:\n- Ein Pflichtfeld wurde nicht gefüllt.\n- Ein referenzierter Datensatz existiert nicht.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt beim Anlegen eines Partners:\n- Ein Logisch gelöschter Datensatz wurde versucht zuzuordnen.\n- Ein Datensatz existiert bereits.\n- Keine Berechtigung Partner anzulegen.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/benutzer/{benutzerId}/partner/opv/lieferant": {
+      "post": {
+        "summary": "Import eines Lieferanten für die Offene Posten Verwaltung",
+        "tags": [
+          "Offene Posten Verwaltung"
+        ],
+        "description": "Importiert einen neuen Lieferanten für die Offene Posten Verwaltung in der eigenen Organisation in ADNOVA+.",
+        "operationId": "addLieferantOPV",
+        "security": [
+          {
+            "service-to-service-oauth": [
+              "import:partner:manage"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartnerOffenePostenVerwaltungCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Lieferant wurde erfolgreich angelegt.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Daten zum Anlegen eines Partners fehlen:\n- Ein Pflichtfeld wurde nicht gefüllt.\n- Ein referenzierter Datensatz existiert nicht.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt beim Anlegen eines Partners:\n- Ein Logisch gelöschter Datensatz wurde versucht zuzuordnen.\n- Ein Datensatz existiert bereits.\n- Keine Berechtigung Partner anzulegen.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/benutzer/{benutzerId}/betrieb/{betriebsnummer}/partner/opv/lieferant": {
+      "post": {
+        "summary": "Import eines Lieferanten für die Offene Posten Verwaltung",
+        "tags": [
+          "Offene Posten Verwaltung"
+        ],
+        "description": "Importiert einen neuen Lieferanten für die Offene Posten Verwaltung in dem Unternehmen eines Mandanten der eigenen Organisation.",
+        "operationId": "addLieferantOPVForMandant",
+        "security": [
+          {
+            "service-to-service-oauth": [
+              "import:partner:manage"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartnerOffenePostenVerwaltungCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Lieferant wurde erfolgreich angelegt.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Daten zum Anlegen eines Partners fehlen:\n- Ein Pflichtfeld wurde nicht gefüllt.\n- Ein referenzierter Datensatz existiert nicht.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt beim Anlegen eines Partners:\n- Ein logisch gelöschter Datensatz wurde versucht zuzuordnen.\n- Ein Datensatz existiert bereits.\n- Keine Berechtigung Partner anzulegen.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/partner": {
+      "get": {
+        "summary": "Lesen von Partnern",
+        "tags": [
+          "Partner lesen"
+        ],
+        "description": "Gibt alle Partner zurück. Die Partner werden auf Basis der Berechtigungen des Benutzers, der den Endpunkt \naufruft, eingegrenzt. Berücksichtigt wird hierbei, auf welche Firmen der Benutzer Zugriff hat. Es werden \nnur die Partner der eigenen Organisation zurückgegeben.\nAls Buchstelle können daher nur eigene Partner ermittelt werden und keine Partner der Mandanten selbst.\n",
+        "operationId": "readPartnerList",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "import:partner:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abfrage von Partnern erfolgreich.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartnerReadResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/partner/extended": {
+      "get": {
+        "summary": "Lesen von Partnern mit erweiterten Informationen",
+        "tags": [
+          "Partner lesen"
+        ],
+        "description": "Gibt alle Partner auf Basis der Berechtigungen des Benutzers, der den Endpunkt \naufruft, zurück. Berücksichtigt wird hierbei, auf welche Firmen der Benutzer Zugriff hat. Es werden \nnur die Partner der eigenen Organisation zurückgegeben.\nAls Buchstelle können daher nur eigene Partner ermittelt werden und keine Partner der Mandanten selbst.\nEs werden zum Partner noch Zusatzfeldwerte und zugeordnete Stichwörter ausgegeben. \nWenn diese Informationen nicht benötigt werden, sollte aus Performancegründen der Standard Aufruf zum Laden von \nPartnern genutzt werden.\n",
+        "operationId": "readPartnerExtendedList",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "import:partner:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abfrage von Partnern erfolgreich.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartnerExtendedReadResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/partner/{partnerId}": {
+      "get": {
+        "summary": "Lesen eines einzelnen Partners",
+        "tags": [
+          "Partner lesen"
+        ],
+        "description": "Gibt einen Partner zurück. \nFür den Partner werden die Berechtigungen des Benutzers, der den Endpunkt aufruft, geprüft.\nEs wird nur der Partner der eigenen Organisation zurückgegeben. \nAls Buchstelle können daher nur eigene Partner anhand der Nummer ermittelt werden und keine Partner der Mandanten selbst.\n",
+        "operationId": "readPartner",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "import:partner:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abfrage eines Partners erfolgreich.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerReadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Partner existiert nicht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/partner/mandant": {
+      "post": {
+        "summary": "Import eines Mandanten",
+        "tags": [
+          "Partner anlegen"
+        ],
+        "description": "Importiert einen neuen Mandanten für die eigene Organisation in ADNOVA+.\n",
+        "operationId": "addMandant",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "import:partner:write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MandantCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Mandant wurde erfolgreich angelegt.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MandantCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Daten zum Anlegen eines Partners fehlen:\n- Ein Pflichtfeld wurde nicht gefüllt.\n- Ein referenzierter Datensatz existiert nicht.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt beim Anlegen eines Partners:\n- Ein logisch gelöschter Datensatz wurde versucht zuzuordnen.\n- Ein Datensatz existiert bereits.\n- Keine Berechtigung Partner anzulegen.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/partner/mandant/{partnerId}": {
+      "put": {
+        "summary": "Aktualisieren eines Mandanten",
+        "tags": [
+          "Partner aktualisieren"
+        ],
+        "description": "Aktualisieren eines Mandanten. Es können allgemeine Daten sowie Adress- und Kommunikationsdaten geändert werden.\nDer Mandant wird mit den Werten überschrieben, die hier mitgegeben werden. Wenn ein Wert nicht gesetzt ist, \nwird dieser dann zum Mandanten entfernt.\n",
+        "operationId": "updateMandant",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "import:partner:write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MandantUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mandant wurde erfolgreich bearbeitet."
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Daten zum Aktualisieren eines Partners sind fehlerhaft:\n- Ein Pflichtfeld wurde nicht gefüllt.\n- Ein referenzierter Datensatz existiert nicht.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt beim Aktualisieren eines Partners:\n- Ein logisch gelöschter Datensatz wurde versucht zuzuordnen.\n- Ein Datensatz existiert bereits.\n- Keine Berechtigung Partner zu bearbeiten.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/firmen": {
+      "get": {
+        "summary": "Lesen von Firmen",
+        "tags": [
+          "Firmen"
+        ],
+        "description": "Gibt alle Firmen auf Basis der Berechtigungen des Benutzers, der den Endpunkt \naufruft, zurück. Es werden nur die Firmen der eigenen Organisation zurückgegeben.\n",
+        "operationId": "readFirmenList",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "import:partner:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abfrage von Firmen erfolgreich.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FirmaReadResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/firmen/extended": {
+      "get": {
+        "summary": "Lesen von Firmen mit erweiterten Informationen",
+        "tags": [
+          "Firmen"
+        ],
+        "description": "Gibt alle Firmen auf Basis der Berechtigungen des Benutzers, der den Endpunkt \naufruft, zurück.\nDie Firmen müssen zur der eigenen Organisation gehören und das Recht zum Bearbeiten muss vorliegen.\nEs werden Stammdaten zu den Firmen mit geladen.\nWenn diese Informationen nicht benötigt werden, sollte aus Performancegründen der Aufruf 'api/v1/firmen' zum Laden von \nFirmen genutzt werden.\n",
+        "operationId": "readFirmenExtendedList",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "firma:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abfrage von Firmen erfolgreich.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FirmaExtendedReadResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/firmen/{firmaId}": {
+      "get": {
+        "summary": "Lesen einer einzelnen Firma",
+        "tags": [
+          "Firmen"
+        ],
+        "description": "Gibt eine Firma mit den Stammdaten zurück.\nDie Firma muss zu der eigenen Organisation gehören und das Recht zum Bearbeiten muss vorliegen.\n",
+        "operationId": "readFirma",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "firma:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abfrage einer Firma erfolgreich.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirmaExtendedReadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Firma existiert nicht.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Aktualisieren einer Firma",
+        "tags": [
+          "Firmen"
+        ],
+        "description": "Aktualisieren einer Firma. Es können allgemeine Daten geändert werden.\nDie Firma muss zu der eigenen Organisation gehören und das Recht zum Bearbeiten muss vorliegen.\nDie Firma wird mit den Werten überschrieben, die hier mitgegeben werden. Wenn ein Wert nicht gesetzt ist, \nwird dieser dann zur Firma entfernt.\n",
+        "operationId": "updateFirma",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "firma:write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FirmaUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Firma wurde erfolgreich bearbeitet."
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Daten zum Aktualisieren einer Firma sind fehlerhaft:\n  - Ein Pflichtfeld wurde nicht gefüllt.\n  - Ein referenzierter Datensatz existiert nicht.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt beim Aktualisieren einer Firma:\n- Ein logisch gelöschter Datensatz wurde versucht zuzuordnen.\n- Ein Datensatz existiert bereits.\n- Keine Berechtigung Firmen zu bearbeiten.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/geschaeftspartner": {
+      "get": {
+        "summary": "Lesen von Geschäftspartnern",
+        "tags": [
+          "Geschaeftspartner"
+        ],
+        "description": "Gibt alle Geschäftspartner auf Basis der Berechtigungen des Benutzers, der den Endpunkt \naufruft, zurück. Es werden nur die Geschäftspartner der eigenen Organisation zurückgegeben.\n",
+        "operationId": "readGeschaeftspartnerList",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "import:partner:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abfrage von Geschäftspartnern erfolgreich.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GeschaeftspartnerReadResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/partnergruppen": {
+      "get": {
+        "summary": "Lesen von Partnergruppen",
+        "tags": [
+          "Partnergruppen"
+        ],
+        "description": "Gibt alle Partnergruppen auf Basis der Berechtigungen des Benutzers, der den Endpunkt aufruft, zurück.\nEs werden nur die Partnergruppen der eigenen Organisation zurückgegeben.\n",
+        "operationId": "readPartnergruppenList",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "import:partner:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abfrage von Partnergruppen erfolgreich.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartnergruppeFirmaReadResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/anreden": {
+      "get": {
+        "summary": "Lesen von Anreden",
+        "tags": [
+          "Anreden"
+        ],
+        "description": "Gibt alle Anreden der Organisation des Benutzers zurück.\n",
+        "operationId": "readAnredenList",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "import:partner:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abfrage von Anreden erfolgreich.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnredeReadResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/briefanreden": {
+      "get": {
+        "summary": "Lesen von Briefanreden",
+        "tags": [
+          "Anreden"
+        ],
+        "description": "Gibt alle Briefanreden der Organisation des Benutzers zurück.\n",
+        "operationId": "readBriefanredenList",
+        "security": [
+          {
+            "user-to-service-oauth": [
+              "import:partner:read"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abfrage von Briefanreden erfolgreich.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BriefanredeReadResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlerhafte Anfrage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fehlende Authentifizierung.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fehlende Berechtigungen/Scopes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FehlermeldungResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "service-to-service-oauth": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://authentication.landdata.de/auth/realms/landdata/protocol/openid-connect/token/",
+            "scopes": {
+              "import:partner:manage": "Erstellen von Partnern aus dem ADNOVA+ Backend."
+            }
+          }
+        }
+      },
+      "user-to-service-oauth": {
+        "type": "oauth2",
+        "flows": {
+          "implicit": {
+            "authorizationUrl": "https://authentication.landdata.de/auth/realms/landdata/protocol/openid-connect/token",
+            "scopes": {
+              "import:partner:write": "Erstellen von Partnern über externe Clients, Authentifizierung über einen Benutzer.",
+              "import:partner:read": "Lesen von Partnern über externe Clients, Authentifizierung über einen Benutzer.",
+              "firma:read": "Lesen von Firmen über externe Clients, Authentifizierung über einen Benutzer.",
+              "firma:write": "Aktualisieren von Firmen über externe Clients, Authentifizierung über einen Benutzer."
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "BenutzerId": {
+        "name": "benutzerId",
+        "description": "Id des Benutzers, der die Aktion durchführt.",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "8f69b58d-2c0d-4398-bc72-9bd226e0bb16"
+        }
+      },
+      "Betriebsnummer": {
+        "name": "betriebsnummer",
+        "description": "Betriebsnummer einer Firma bzw. eines Mandanten.\nWird benötigt, wenn für einen Mandanten ein Kunde/Lieferant angelegt werden soll.\n",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/Betriebsnummer"
+        }
+      },
+      "PartnerId": {
+        "name": "partnerId",
+        "description": "Id des Partners.",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/PartnerId"
+        }
+      },
+      "PartnerFilter": {
+        "name": "partnerFilter",
+        "description": "Ermöglicht die Filterung von Partnern nach bestimmten Kriterien.",
+        "in": "query",
+        "schema": {
+          "$ref": "#/components/schemas/PartnerFilter"
+        },
+        "explode": true
+      },
+      "FirmaId": {
+        "name": "firmaId",
+        "description": "Identifikation einer Firma.",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "$ref": "#/components/schemas/FirmaId"
+        }
+      },
+      "FirmaIdPath": {
+        "name": "firmaId",
+        "description": "Identifikation einer Firma.",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/FirmaId"
+        }
+      }
+    },
+    "schemas": {
+      "Adresse": {
+        "description": "Adressdaten zu einem Partner oder einer Firma.\nJe nach Adressart gibt es unterschiedliche Pflichtfelder.\nBei der Adressart Strasse muss das Feld Strasse gefüllt sein.\nBei der Adressart Postfach muss das Feld Postfach gefüllt sein.\nBei der Adressart Grosskunde muss kein zusätzliches Feld gefüllt sein.\n",
+        "type": "object",
+        "required": [
+          "adressart",
+          "postleitzahl",
+          "ort"
+        ],
+        "properties": {
+          "adressart": {
+            "$ref": "#/components/schemas/Adressart"
+          },
+          "adresszusatz": {
+            "$ref": "#/components/schemas/Adresszusatz"
+          },
+          "land": {
+            "$ref": "#/components/schemas/Land"
+          },
+          "ort": {
+            "$ref": "#/components/schemas/Ort"
+          },
+          "ortsteil": {
+            "$ref": "#/components/schemas/Ortsteil"
+          },
+          "postfach": {
+            "$ref": "#/components/schemas/Postfach"
+          },
+          "postleitzahl": {
+            "$ref": "#/components/schemas/Postleitzahl"
+          },
+          "strasse": {
+            "$ref": "#/components/schemas/Strasse"
+          }
+        }
+      },
+      "AnredeReadResponse": {
+        "description": "Basisinformationen zu einer Anrede beim Lesen.",
+        "type": "object",
+        "required": [
+          "anredeId",
+          "anredenbezeichnung",
+          "anredennummer"
+        ],
+        "properties": {
+          "anredeId": {
+            "$ref": "#/components/schemas/AnredeId"
+          },
+          "anredenbezeichnung": {
+            "$ref": "#/components/schemas/Anredenbezeichnung"
+          },
+          "anredennummer": {
+            "$ref": "#/components/schemas/Anredennummer"
+          }
+        }
+      },
+      "Bankkonto": {
+        "description": "Informationen zu einem Bankkonto.",
+        "type": "object",
+        "required": [
+          "iban",
+          "kontoinhaber"
+        ],
+        "properties": {
+          "bankbezeichnung": {
+            "$ref": "#/components/schemas/Bankbezeichnung"
+          },
+          "bic": {
+            "$ref": "#/components/schemas/BankBic"
+          },
+          "iban": {
+            "$ref": "#/components/schemas/Iban"
+          },
+          "kontoinhaber": {
+            "$ref": "#/components/schemas/Kontoinhaber"
+          }
+        }
+      },
+      "BankSpezifischeAngaben": {
+        "description": "Spezifische Angaben zum Partnertyp Bank.",
+        "type": "object",
+        "required": [
+          "bic"
+        ],
+        "properties": {
+          "bic": {
+            "$ref": "#/components/schemas/BankBic"
+          }
+        }
+      },
+      "BriefanredeReadResponse": {
+        "description": "Basisinformationen zu einer Briefanrede beim Lesen.",
+        "type": "object",
+        "required": [
+          "briefanredeId",
+          "briefanredenbezeichnung",
+          "briefanredennummer"
+        ],
+        "properties": {
+          "briefanredeId": {
+            "$ref": "#/components/schemas/BriefanredeId"
+          },
+          "briefanredenbezeichnung": {
+            "$ref": "#/components/schemas/Briefanredenbezeichnung"
+          },
+          "briefanredennummer": {
+            "$ref": "#/components/schemas/Briefanredennummer"
+          }
+        }
+      },
+      "FinanzamtSpezifischeAngaben": {
+        "description": "Spezifische Angaben zum Partnertyp Finanzamt.",
+        "type": "object",
+        "required": [
+          "bundesland",
+          "finanzamtsschluessel"
+        ],
+        "properties": {
+          "bundesland": {
+            "$ref": "#/components/schemas/Bundesland"
+          },
+          "finanzamtsschluessel": {
+            "$ref": "#/components/schemas/Finanzamtsschluessel"
+          }
+        }
+      },
+      "FirmaExtendedReadResponse": {
+        "description": "Enthält neben den grundlegenden Informationen zu einer Firma noch weitere Stammdaten.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FirmaReadResponse"
+          },
+          {
+            "type": "object",
+            "required": [
+              "adresse"
+            ],
+            "properties": {
+              "adresse": {
+                "$ref": "#/components/schemas/Adresse"
+              },
+              "bankkonten": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Bankkonto"
+                }
+              },
+              "geschaeftstaetigkeit": {
+                "$ref": "#/components/schemas/Geschaeftstaetigkeit"
+              },
+              "glaeubigerId": {
+                "$ref": "#/components/schemas/GlaeubigerId"
+              },
+              "kommunikationen": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Kommunikation"
+                }
+              },
+              "kontenrahmen": {
+                "$ref": "#/components/schemas/Kontenrahmen"
+              },
+              "steuernummern": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SteuernummerFinanzamtRead"
+                }
+              },
+              "umsatzsteuerIdNummer": {
+                "$ref": "#/components/schemas/UmsatzsteuerIdNummer"
+              }
+            }
+          }
+        ]
+      },
+      "FirmaReadResponse": {
+        "description": "Basisinformationen zu einer Firma beim Lesen.",
+        "type": "object",
+        "required": [
+          "firmaId",
+          "firmenbezeichnung",
+          "firmennummer"
+        ],
+        "properties": {
+          "firmaId": {
+            "$ref": "#/components/schemas/FirmaId"
+          },
+          "firmenbezeichnung": {
+            "$ref": "#/components/schemas/Firmenbezeichnung"
+          },
+          "firmennummer": {
+            "$ref": "#/components/schemas/Firmennummer"
+          }
+        }
+      },
+      "FirmaUpdateRequest": {
+        "description": "Enthält Informationen um eine Firma zu aktualisieren.\nBei Firmen von Mandaten kann die Firmennummer nicht geändert werden.\n",
+        "type": "object",
+        "required": [
+          "adresse",
+          "firmenbezeichnung",
+          "firmennummer"
+        ],
+        "properties": {
+          "adresse": {
+            "$ref": "#/components/schemas/Adresse"
+          },
+          "firmenbezeichnung": {
+            "$ref": "#/components/schemas/Firmenbezeichnung"
+          },
+          "firmennummer": {
+            "$ref": "#/components/schemas/Firmennummer"
+          },
+          "geschaeftstaetigkeit": {
+            "$ref": "#/components/schemas/Geschaeftstaetigkeit"
+          },
+          "glaeubigerId": {
+            "$ref": "#/components/schemas/GlaeubigerId"
+          },
+          "kommunikationen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Kommunikation"
+            }
+          },
+          "kontenrahmen": {
+            "$ref": "#/components/schemas/Kontenrahmen"
+          },
+          "steuernummern": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SteuernummerFinanzamtUpdate"
+            }
+          },
+          "umsatzsteuerIdNummer": {
+            "$ref": "#/components/schemas/UmsatzsteuerIdNummer"
+          }
+        }
+      },
+      "Geschaeftspartner": {
+        "description": "Es muss entweder eine Id eines vorhandenen Geschäftspartner übergeben werden, unter dem der Partner angelegt werden soll,\noder eine Nummer und Bezeichnung für einen neuen Geschäftspartner, der mit dem Partner angelegt werden soll.\n",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/GeschaeftspartnerAuswahl"
+          },
+          {
+            "$ref": "#/components/schemas/GeschaeftspartnerCreate"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "geschaeftspartnerTyp"
+        }
+      },
+      "GeschaeftspartnerAuswahl": {
+        "description": "Id des ausgewählten Geschäftspartners.",
+        "type": "object",
+        "required": [
+          "geschaeftspartnerTyp",
+          "geschaeftspartnerId"
+        ],
+        "properties": {
+          "geschaeftspartnerTyp": {
+            "type": "string",
+            "example": "GeschaeftspartnerAuswahl"
+          },
+          "geschaeftspartnerId": {
+            "$ref": "#/components/schemas/GeschaeftspartnerId"
+          }
+        }
+      },
+      "GeschaeftspartnerCreate": {
+        "description": "Basisinformationen um einen Geschäftspartner anzulegen.\nWenn keine Geschaeftspartnernummer angegeben wird, so wird die nächste freie Geschaeftspartnernummer verwendet.\n",
+        "type": "object",
+        "required": [
+          "geschaeftspartnerbezeichnung",
+          "geschaeftspartnerTyp"
+        ],
+        "properties": {
+          "geschaeftspartnerbezeichnung": {
+            "$ref": "#/components/schemas/Geschaeftspartnerbezeichnung"
+          },
+          "geschaeftspartnerTyp": {
+            "type": "string",
+            "example": "GeschaeftspartnerCreate"
+          },
+          "geschaeftspartnernummer": {
+            "$ref": "#/components/schemas/Geschaeftspartnernummer"
+          }
+        }
+      },
+      "GeschaeftspartnerReadResponse": {
+        "description": "Basisinformationen zu einem Geschäftspartner beim Lesen.",
+        "type": "object",
+        "required": [
+          "geschaeftspartnerbezeichnung",
+          "geschaeftspartnerId",
+          "geschaeftspartnernummer"
+        ],
+        "properties": {
+          "geschaeftspartnerbezeichnung": {
+            "$ref": "#/components/schemas/Geschaeftspartnerbezeichnung"
+          },
+          "geschaeftspartnerId": {
+            "$ref": "#/components/schemas/GeschaeftspartnerId"
+          },
+          "geschaeftspartnernummer": {
+            "$ref": "#/components/schemas/Geschaeftspartnernummer"
+          },
+          "geschaeftspartnerstatus": {
+            "$ref": "#/components/schemas/Geschaeftspartnerstatus"
+          }
+        }
+      },
+      "Kommunikation": {
+        "description": "Beschreibt Möglichkeiten mit einem Partner oder einer Firma zu kommunizieren.",
+        "type": "object",
+        "required": [
+          "inhalt",
+          "medium",
+          "nutzung"
+        ],
+        "properties": {
+          "exportEtax": {
+            "$ref": "#/components/schemas/ExportEtax"
+          },
+          "geschaeftsfuehrung": {
+            "$ref": "#/components/schemas/Kommunikationsgeschaeftsfuehrung"
+          },
+          "inhalt": {
+            "$ref": "#/components/schemas/Kommunikationsinhalt"
+          },
+          "kommunikationId": {
+            "$ref": "#/components/schemas/KommunikationId"
+          },
+          "medium": {
+            "$ref": "#/components/schemas/Kommunikationsmedium"
+          },
+          "nutzung": {
+            "$ref": "#/components/schemas/Kommunikationsnutzung"
+          },
+          "standard": {
+            "$ref": "#/components/schemas/Kommunikationsstandard"
+          }
+        }
+      },
+      "Kontoverbindung": {
+        "description": "Enthält Informationen zum Bankkonto eines Partners.",
+        "type": "object",
+        "required": [
+          "iban",
+          "kontoinhaber"
+        ],
+        "properties": {
+          "iban": {
+            "$ref": "#/components/schemas/Iban"
+          },
+          "kontoinhaber": {
+            "$ref": "#/components/schemas/Kontoinhaber"
+          }
+        }
+      },
+      "MandantCreateRequest": {
+        "description": "Enthält Informationen um einen Mandanten anzulegen.\nEs muss entweder eine Id eines vorhandenen Geschäftspartner übergeben werden, unter dem der Partner angelegt werden soll,\noder eine Nummer und Bezeichnung für einen neuen Geschäftspartner, der mit dem Partner angelegt werden soll.\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartnerCreate"
+          },
+          {
+            "type": "object",
+            "required": [
+              "adresse",
+              "geschaeftspartner",
+              "partnerangaben",
+              "zugeordneteFirmen"
+            ],
+            "properties": {
+              "mandantSpezifischeAngaben": {
+                "$ref": "#/components/schemas/MandantSpezifischeAngabenBasis"
+              }
+            }
+          }
+        ]
+      },
+      "MandantCreateResponse": {
+        "description": "Informationen zum erfolgreich angelegten Mandant.\nEs wird zusätzlich immer eine neue Firma mit angelegt.\nZudem werden die Informationen zum Geschäftspartner des Mandanten mit zurückgegeben.\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartnerCreateResponse"
+          },
+          {
+            "type": "object",
+            "required": [
+              "firma",
+              "geschaeftspartner"
+            ],
+            "properties": {
+              "firma": {
+                "$ref": "#/components/schemas/FirmaReadResponse"
+              },
+              "geschaeftspartner": {
+                "$ref": "#/components/schemas/GeschaeftspartnerReadResponse"
+              }
+            }
+          }
+        ]
+      },
+      "MandantSpezifischeAngabenBasis": {
+        "description": "Spezifische Basisinformationen zum Partnertyp Mandant.",
+        "type": "object",
+        "properties": {
+          "betriebsnummer": {
+            "$ref": "#/components/schemas/Betriebsnummer"
+          },
+          "organisationsnummer": {
+            "$ref": "#/components/schemas/Organisationsnummer"
+          }
+        }
+      },
+      "MandantSpezifischeAngabenRead": {
+        "description": "Spezifische Basisinformationen zum Partnertyp Mandant beim Lesen.\nDie Empfängernummer kann nicht geändert werden, deswegen ist sie nur beim Lesen vorhanden.\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MandantSpezifischeAngabenBasis"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "empfaengernummer": {
+                "$ref": "#/components/schemas/Empfaengernummer"
+              }
+            }
+          }
+        ]
+      },
+      "MandantUpdateRequest": {
+        "description": "Enthält Informationen um einen Mandanten zu aktualisieren.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartnerCreateUpdate"
+          },
+          {
+            "type": "object",
+            "required": [
+              "adresse",
+              "partnerangaben",
+              "zugeordneteFirmen"
+            ],
+            "properties": {
+              "mandantSpezifischeAngaben": {
+                "$ref": "#/components/schemas/MandantSpezifischeAngabenBasis"
+              }
+            }
+          }
+        ]
+      },
+      "PartnerangabenBasis": {
+        "description": "Angaben zum Partner.\nJe nach Partnerart gibt es unterschiedliche Pflichtfelder.\n",
+        "type": "object",
+        "required": [
+          "partnerart"
+        ],
+        "properties": {
+          "geschaeftstaetigkeit": {
+            "$ref": "#/components/schemas/Geschaeftstaetigkeit"
+          },
+          "leitwegIdNummer": {
+            "$ref": "#/components/schemas/LeitwegIdNummer"
+          },
+          "partnerart": {
+            "$ref": "#/components/schemas/Partnerart"
+          },
+          "rechtsform": {
+            "$ref": "#/components/schemas/Rechtsform"
+          },
+          "umsatzsteuerIdNummer": {
+            "$ref": "#/components/schemas/UmsatzsteuerIdNummer"
+          }
+        }
+      },
+      "PartnerangabenCreateUpdate": {
+        "description": "Enthält Informationen um Partnerangaben anzulegen oder zu aktualisieren.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartnerangabenBasis"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "anredeId": {
+                "$ref": "#/components/schemas/AnredeId"
+              },
+              "briefanredeId": {
+                "$ref": "#/components/schemas/BriefanredeId"
+              }
+            }
+          }
+        ]
+      },
+      "PartnerangabenRead": {
+        "description": "Informationen zu Partnerangaben beim Lesen.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartnerangabenBasis"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "anrede": {
+                "$ref": "#/components/schemas/AnredeReadResponse"
+              },
+              "briefanrede": {
+                "$ref": "#/components/schemas/BriefanredeReadResponse"
+              }
+            }
+          }
+        ]
+      },
+      "Partnerart": {
+        "description": "Gibt an um was für eine Partnerart es sich handelt.\nJe nach Partnerart sind andere Angaben bei der Anlage notwendig.\nBei der Partnerart Person müssen Vorname und Nachname gefüllt sein.\nBei der Partnerart Unternehmen muss die Bezeichnung1 gefüllt sein.\n",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/PartnerartPerson"
+          },
+          {
+            "$ref": "#/components/schemas/PartnerartUnternehmen"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "partnerart"
+        }
+      },
+      "PartnerartPerson": {
+        "description": "Spezifische Informationen zur Partnerart Person.",
+        "type": "object",
+        "required": [
+          "nachname",
+          "partnerart",
+          "vorname"
+        ],
+        "properties": {
+          "nachname": {
+            "$ref": "#/components/schemas/Nachname"
+          },
+          "namenszusatz": {
+            "$ref": "#/components/schemas/Namenszusatz"
+          },
+          "partnerart": {
+            "type": "string",
+            "example": "PartnerartPerson"
+          },
+          "steuerIdNummer": {
+            "$ref": "#/components/schemas/SteuerIdNummer"
+          },
+          "titel": {
+            "$ref": "#/components/schemas/Titel"
+          },
+          "vorname": {
+            "$ref": "#/components/schemas/Vorname"
+          }
+        }
+      },
+      "PartnerartUnternehmen": {
+        "description": "Spezifische Informationen zur Partnerart Unternehmen.",
+        "type": "object",
+        "required": [
+          "bezeichnung1",
+          "partnerart"
+        ],
+        "properties": {
+          "bezeichnung1": {
+            "$ref": "#/components/schemas/Bezeichnung1"
+          },
+          "bezeichnung2": {
+            "$ref": "#/components/schemas/Bezeichnung2"
+          },
+          "bezeichnung3": {
+            "$ref": "#/components/schemas/Bezeichnung3"
+          },
+          "bezeichnung4": {
+            "$ref": "#/components/schemas/Bezeichnung4"
+          },
+          "partnerart": {
+            "type": "string",
+            "example": "PartnerartUnternehmen"
+          },
+          "wirtschaftsIdNummer": {
+            "$ref": "#/components/schemas/WirtschaftsIdNummer"
+          }
+        }
+      },
+      "PartnerBasis": {
+        "description": "Basisinformationen zu einem Partner.",
+        "type": "object",
+        "required": [
+          "adresse"
+        ],
+        "properties": {
+          "adresse": {
+            "$ref": "#/components/schemas/Adresse"
+          },
+          "exportEtax": {
+            "$ref": "#/components/schemas/ExportEtax"
+          },
+          "kontoverbindung": {
+            "$ref": "#/components/schemas/Kontoverbindung"
+          },
+          "kommunikationen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Kommunikation"
+            }
+          },
+          "partnerBis": {
+            "$ref": "#/components/schemas/PartnerBis"
+          },
+          "partnernummer": {
+            "$ref": "#/components/schemas/Partnernummer"
+          },
+          "partnerSeit": {
+            "$ref": "#/components/schemas/PartnerSeit"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Partnerstatus"
+          },
+          "veranlagung": {
+            "$ref": "#/components/schemas/Veranlagung"
+          }
+        }
+      },
+      "PartnerCreate": {
+        "description": "Basisinformationen zum Anlegen eines Partners.\nEs muss entweder eine Id eines vorhandenen Geschäftspartner übergeben werden, unter dem der Partner angelegt werden soll,\noder eine Nummer und Bezeichnung für einen neuen Geschäftspartner, der mit dem Partner angelegt werden soll.\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartnerCreateUpdate"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "geschaeftspartner": {
+                "$ref": "#/components/schemas/Geschaeftspartner"
+              }
+            }
+          }
+        ]
+      },
+      "PartnerCreateUpdate": {
+        "description": "Basisinformationen zum Anlegen oder Aktualisieren eines Partners.\nIn der Liste der zugeordneten Firmen muss eine Firma als Abrechnungsempfänger zum Partner angegeben werden.\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartnerBasis"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "partnerangaben": {
+                "$ref": "#/components/schemas/PartnerangabenCreateUpdate"
+              },
+              "zugeordneteFirmen": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ZugeordneteFirma"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PartnerCreateResponse": {
+        "description": "Informationen zum erfolgreich angelegten Partner.\n",
+        "type": "object",
+        "required": [
+          "partnerId",
+          "partnernummer"
+        ],
+        "properties": {
+          "partnerId": {
+            "$ref": "#/components/schemas/PartnerId"
+          },
+          "partnernummer": {
+            "$ref": "#/components/schemas/Partnernummer"
+          },
+          "warnung": {
+            "$ref": "#/components/schemas/Warnung"
+          }
+        }
+      },
+      "PartnerExtendedReadResponse": {
+        "description": "Enthält neben den Stammdaten des Partners noch Informationen zu zugeordneten Stichwörtern und Zusatzfeldwerten.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartnerReadResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "stichwoerter": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Stichwort"
+                }
+              },
+              "zusatzfeldwerte": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Zusatzfeldwert"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PartnerFilter": {
+        "description": "Enthält die Filterkriterien mit Hilfe derer Partner gefiltert werden.\nBei einem Datum wird einschließlich des übergebenen Wertes gesucht.\n",
+        "type": "object",
+        "properties": {
+          "letzteAenderungSeit": {
+            "$ref": "#/components/schemas/LetzteAenderung"
+          },
+          "geschaeftspartnerId": {
+            "$ref": "#/components/schemas/GeschaeftspartnerId"
+          }
+        }
+      },
+      "PartnergruppeFirmaReadResponse": {
+        "description": "Basisinformationen zu einer Partnergruppe, inklusive Firma.",
+        "type": "object",
+        "required": [
+          "firma",
+          "partnergruppe"
+        ],
+        "properties": {
+          "firma": {
+            "$ref": "#/components/schemas/FirmaReadResponse"
+          },
+          "partnergruppe": {
+            "$ref": "#/components/schemas/PartnergruppeRead"
+          }
+        }
+      },
+      "PartnergruppeRead": {
+        "description": "Basisinformationen zu einer Partnergruppe beim Lesen.\nÜber eine Partnergruppe werden Berechtigungen für eine Gruppe von Partnern zusammengefasst.\n",
+        "type": "object",
+        "required": [
+          "partnergruppeId",
+          "partnergruppenbezeichnung",
+          "partnergruppennummer"
+        ],
+        "properties": {
+          "partnergruppeId": {
+            "$ref": "#/components/schemas/PartnergruppeId"
+          },
+          "partnergruppenbezeichnung": {
+            "$ref": "#/components/schemas/Partnergruppenbezeichnung"
+          },
+          "partnergruppennummer": {
+            "$ref": "#/components/schemas/Partnergruppennummer"
+          }
+        }
+      },
+      "PartnerOffenePostenVerwaltungCreateRequest": {
+        "description": "Basisinformationen zum Anlegen eines Partners für die Offene Posten Verwaltung.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartnerCreate"
+          },
+          {
+            "type": "object",
+            "required": [
+              "adresse",
+              "geschaeftspartner",
+              "partnerangaben",
+              "zugeordneteFirmen"
+            ],
+            "properties": {
+              "personenkonto": {
+                "$ref": "#/components/schemas/Personenkonto"
+              }
+            }
+          }
+        ]
+      },
+      "PartnerReadResponse": {
+        "description": "Informationen zu einem Partner beim Lesen.\nJe nach Partnertyp sind spezifische Angaben vorhanden.\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartnerBasis"
+          },
+          {
+            "type": "object",
+            "required": [
+              "geschaeftspartner",
+              "partnerangaben",
+              "partnerId",
+              "partnertyp",
+              "zugeordneteFirmen"
+            ],
+            "properties": {
+              "bankSpezifischeAngaben": {
+                "$ref": "#/components/schemas/BankSpezifischeAngaben"
+              },
+              "finanzamtSpezifischeAngaben": {
+                "$ref": "#/components/schemas/FinanzamtSpezifischeAngaben"
+              },
+              "geschaeftspartner": {
+                "$ref": "#/components/schemas/GeschaeftspartnerReadResponse"
+              },
+              "letzteAenderung": {
+                "$ref": "#/components/schemas/LetzteAenderung"
+              },
+              "mandantSpezifischeAngaben": {
+                "$ref": "#/components/schemas/MandantSpezifischeAngabenRead"
+              },
+              "partnerangaben": {
+                "$ref": "#/components/schemas/PartnerangabenRead"
+              },
+              "partnerId": {
+                "$ref": "#/components/schemas/PartnerId"
+              },
+              "partnertyp": {
+                "$ref": "#/components/schemas/Partnertyp"
+              },
+              "zugeordneteFirmen": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ZugeordneteFirmaRead"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Personenkonto": {
+        "description": "Informationen zu Personenkonten für die Anlage von Partner für die Offene Posten Verwaltung.\n",
+        "type": "object",
+        "required": [
+          "kontoart",
+          "personenkonto"
+        ],
+        "properties": {
+          "forderungVerbindlichkeitKontonummerKKBeBu": {
+            "$ref": "#/components/schemas/ForderungVerbindlichkeitKontonummerKKBeBu"
+          },
+          "kontoart": {
+            "$ref": "#/components/schemas/Kontoart"
+          },
+          "personenkonto": {
+            "$ref": "#/components/schemas/Personenkontonummer"
+          }
+        }
+      },
+      "SteuernummerFinanzamtRead": {
+        "description": "Steuernummer, inklusive des zuständigen Finanzamtes zu einer Firma.",
+        "type": "object",
+        "required": [
+          "finanzamtsschluessel",
+          "finanzamtsbezeichnung",
+          "steuernummer"
+        ],
+        "properties": {
+          "exportEtax": {
+            "$ref": "#/components/schemas/ExportEtax"
+          },
+          "finanzamtsartAnsaessigkeitAusland": {
+            "$ref": "#/components/schemas/finanzamtsartAnsaessigkeitAusland"
+          },
+          "finanzamtsartBetrieb": {
+            "$ref": "#/components/schemas/finanzamtsartBetrieb"
+          },
+          "finanzamtsartLohnsteuer": {
+            "$ref": "#/components/schemas/finanzamtsartLohnsteuer"
+          },
+          "finanzamtsartUmsatzsteuer": {
+            "$ref": "#/components/schemas/finanzamtsartUmsatzsteuer"
+          },
+          "finanzamtsartWohnsitz": {
+            "$ref": "#/components/schemas/finanzamtsartWohnsitz"
+          },
+          "finanzamtsbezeichnung": {
+            "$ref": "#/components/schemas/Finanzamtsbezeichnung"
+          },
+          "finanzamtsschluessel": {
+            "$ref": "#/components/schemas/Finanzamtsschluessel"
+          },
+          "sepaLastschrift": {
+            "$ref": "#/components/schemas/SepaLastschrift"
+          },
+          "steuernummer": {
+            "$ref": "#/components/schemas/Steuernummer"
+          }
+        }
+      },
+      "SteuernummerFinanzamtUpdate": {
+        "description": "Steuernummer, inklusive des zuständigen Finanzamtes zu einer Firma.",
+        "type": "object",
+        "required": [
+          "finanzamtsschluessel",
+          "steuernummer"
+        ],
+        "properties": {
+          "exportEtax": {
+            "$ref": "#/components/schemas/ExportEtax"
+          },
+          "finanzamtsartAnsaessigkeitAusland": {
+            "$ref": "#/components/schemas/finanzamtsartAnsaessigkeitAusland"
+          },
+          "finanzamtsartBetrieb": {
+            "$ref": "#/components/schemas/finanzamtsartBetrieb"
+          },
+          "finanzamtsartLohnsteuer": {
+            "$ref": "#/components/schemas/finanzamtsartLohnsteuer"
+          },
+          "finanzamtsartUmsatzsteuer": {
+            "$ref": "#/components/schemas/finanzamtsartUmsatzsteuer"
+          },
+          "finanzamtsartWohnsitz": {
+            "$ref": "#/components/schemas/finanzamtsartWohnsitz"
+          },
+          "finanzamtsschluessel": {
+            "$ref": "#/components/schemas/Finanzamtsschluessel"
+          },
+          "sepaLastschrift": {
+            "$ref": "#/components/schemas/SepaLastschrift"
+          },
+          "steuernummer": {
+            "$ref": "#/components/schemas/Steuernummer"
+          }
+        }
+      },
+      "Stichwort": {
+        "description": "Zugeordnetes Stichwort zu einem Partner.",
+        "type": "object",
+        "required": [
+          "stichwortbezeichnung"
+        ],
+        "properties": {
+          "stichwortbezeichnung": {
+            "$ref": "#/components/schemas/Stichwortbezeichnung"
+          }
+        }
+      },
+      "Warnung": {
+        "description": "Informationen zu Feldern, die beim Anlegen eines Partners nicht gesetzt werden konnten.",
+        "type": "object",
+        "properties": {
+          "informationen": {
+            "$ref": "#/components/schemas/Warnungsinformationen"
+          },
+          "nachricht": {
+            "$ref": "#/components/schemas/Warnungsnachricht"
+          }
+        }
+      },
+      "Warnungsinformationen": {
+        "description": "Verknüpft Feldnamen und Fehlermeldung.",
+        "type": "object",
+        "additionalProperties": {
+          "type": "string",
+          "example": "Formatierung nicht valide."
+        }
+      },
+      "ZugeordneteFirma": {
+        "description": "Auswahl zu welchen Firmen und deren Partnergruppen ein Partner gehören soll.\nEin Partner muss mindestens einer Firma zugeordnet werden, kann aber auch mehreren Firmen zugeordnet sein.\nEine der zugeordneten Firmen muss als Abrechnungsempfänger gekennzeichnet sein.\nZu jeder zugeordneten Firma muss auch mindestens eine Partnergruppe zugeordnet sein.\n",
+        "type": "object",
+        "required": [
+          "abrechnungsempfaenger",
+          "firmaId",
+          "partnergruppenIds"
+        ],
+        "properties": {
+          "abrechnungsempfaenger": {
+            "$ref": "#/components/schemas/Abrechnungsempfaenger"
+          },
+          "firmaId": {
+            "$ref": "#/components/schemas/FirmaId"
+          },
+          "partnergruppenIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnergruppeId"
+            }
+          }
+        }
+      },
+      "ZugeordneteFirmaRead": {
+        "description": "Informationen zu einer zugeordneten Firma inklusive der zugeordneten Partnergruppen beim Lesen eines Partners.",
+        "type": "object",
+        "required": [
+          "firmaId",
+          "firmenbezeichnung",
+          "firmennummer",
+          "partnergruppe"
+        ],
+        "properties": {
+          "abrechnungsempfaenger": {
+            "$ref": "#/components/schemas/Abrechnungsempfaenger"
+          },
+          "firmaId": {
+            "$ref": "#/components/schemas/FirmaId"
+          },
+          "firmenbezeichnung": {
+            "$ref": "#/components/schemas/Firmenbezeichnung"
+          },
+          "firmennummer": {
+            "$ref": "#/components/schemas/Firmennummer"
+          },
+          "partnergruppe": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnergruppeRead"
+            }
+          }
+        }
+      },
+      "Zusatzfeldwert": {
+        "description": "Zusatzfeldwert zu einem Partner.",
+        "type": "object",
+        "required": [
+          "zusatzfeldbezeichnung",
+          "zusatzfeldnummer"
+        ],
+        "properties": {
+          "zusatzfeldbezeichnung": {
+            "$ref": "#/components/schemas/Zusatzfeldbezeichnung"
+          },
+          "zusatzfeldnummer": {
+            "$ref": "#/components/schemas/Zusatzfeldnummer"
+          },
+          "wert": {
+            "$ref": "#/components/schemas/Wert"
+          },
+          "veranlagungszeitraum": {
+            "$ref": "#/components/schemas/Veranlagungszeitraum"
+          }
+        }
+      },
+      "Abrechnungsempfaenger": {
+        "description": "true = Diese Firma ist der Empfänger von Abrechnungen.",
+        "type": "boolean",
+        "example": true
+      },
+      "Adresszusatz": {
+        "description": "Zusatz zu einer Adresse.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 30,
+        "example": "z. Hd."
+      },
+      "Anredenbezeichnung": {
+        "description": "Bezeichnung einer Anrede.\nDie Anreden können über ADNOVA+ gepflegt werden.\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "example": "Herrn"
+      },
+      "AnredeId": {
+        "description": "ID der Anrede.",
+        "type": "string",
+        "format": "uuid",
+        "example": "8f69b58d-2c0d-4398-bc72-9bd226e0bb77"
+      },
+      "Anredennummer": {
+        "description": "Nummer einer Anrede.\nDie Anreden können über ADNOVA+ gepflegt werden.\n",
+        "type": "integer",
+        "format": "int64",
+        "example": 1
+      },
+      "Bankbezeichnung": {
+        "description": "Bezeichnung einer Bank.",
+        "type": "string",
+        "example": "Sparkasse Köln"
+      },
+      "BankBic": {
+        "description": "Identifikation einer Bank. Nur bei Partnertyp Bank.",
+        "type": "string",
+        "format": "bic",
+        "example": "COLSDE33"
+      },
+      "Betriebsnummer": {
+        "description": "Betriebsnummer zu einer Firma eines Mandanten.",
+        "type": "integer",
+        "format": "int32",
+        "example": 16661
+      },
+      "Bezeichnung1": {
+        "description": "Bezeichnung für einen Partner.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 60,
+        "example": "Hofladen Meyer"
+      },
+      "Bezeichnung2": {
+        "description": "Ergänzende Bezeichnung für einen Partner.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 60,
+        "example": "Frisches Gemüse"
+      },
+      "Bezeichnung3": {
+        "description": "Kann nur dann gefüllt sein, wenn die PartnerArt Unternehmen ist.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 60,
+        "example": "Spargelverkauf"
+      },
+      "Bezeichnung4": {
+        "description": "Kann nur dann gefüllt sein, wenn die PartnerArt Unternehmen ist.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 60,
+        "example": "Bio"
+      },
+      "Briefanredenbezeichnung": {
+        "description": "Bezeichnung einer Briefanrede.\nDie Briefanreden können über ADNOVA+ gepflegt werden.\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "example": "Sehr geehrter Herr"
+      },
+      "BriefanredeId": {
+        "description": "ID der Briefanrede.",
+        "type": "string",
+        "format": "uuid",
+        "example": "8f69b58d-2c0d-4398-bc72-9bd226e0bb99"
+      },
+      "Briefanredennummer": {
+        "description": "Nummer einer Briefanrede.\nDie Briefanreden können über ADNOVA+ gepflegt werden.\n",
+        "type": "integer",
+        "format": "int64",
+        "example": 2
+      },
+      "Empfaengernummer": {
+        "description": "Empfängernummer der Buchstelle/Organisation.",
+        "type": "integer",
+        "format": "int64",
+        "example": 20
+      },
+      "ExportEtax": {
+        "description": "Kennzeichen Export Etax.",
+        "type": "boolean",
+        "example": false
+      },
+      "FehlermeldungResponse": {
+        "description": "Enthält Informationen zu einem Fehler.",
+        "type": "string",
+        "example": "Es ist ein Fehler aufgetreten."
+      },
+      "Finanzamtsbezeichnung": {
+        "description": "Bezeichnung eines Finanzamt.",
+        "type": "string",
+        "example": "Rotenburg Wümme"
+      },
+      "finanzamtsartAnsaessigkeitAusland": {
+        "description": "Gibt an ob das Finanzamt für die Steuerart Ansässigkeit im Ausland zuständig ist.",
+        "type": "boolean"
+      },
+      "finanzamtsartBetrieb": {
+        "description": "Gibt an ob das Finanzamt für die Steuerart Betrieb zuständig ist.",
+        "type": "boolean"
+      },
+      "finanzamtsartLohnsteuer": {
+        "description": "Gibt an ob das Finanzamt für die Steuerart Lohnsteuer zuständig ist.",
+        "type": "boolean"
+      },
+      "finanzamtsartUmsatzsteuer": {
+        "description": "Gibt an ob das Finanzamt für die Steuerart Umsatzsteuer zuständig ist.",
+        "type": "boolean"
+      },
+      "finanzamtsartWohnsitz": {
+        "description": "Gibt an ob das Finanzamt für die Steuerart Wohnsitz zuständig ist.",
+        "type": "boolean"
+      },
+      "Finanzamtsschluessel": {
+        "description": "Identifiziert ein Finanzamt. Nur bei Partnertyp Finanzamt.",
+        "type": "integer",
+        "format": "int32",
+        "minimum": 1000,
+        "maximum": 9999,
+        "example": 1010
+      },
+      "Firmenbezeichnung": {
+        "description": "Bezeichnung einer Firma.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 60,
+        "example": "Heinz Zuversicht"
+      },
+      "FirmaId": {
+        "description": "Id einer Firma.",
+        "type": "string",
+        "format": "uuid",
+        "example": "8f69b58d-2c0d-4398-bc72-9bd226e0bb11"
+      },
+      "Firmennummer": {
+        "description": "Nummer über die eine bestehende Firma aus ADNOVA+ ausgewählt werden kann.",
+        "type": "integer",
+        "format": "int64",
+        "example": 1
+      },
+      "ForderungVerbindlichkeitKontonummerKKBeBu": {
+        "description": "Kontonummer für die Offene Posten Verwaltung im Belegbuch.",
+        "type": "integer",
+        "format": "int32",
+        "example": 111100
+      },
+      "Geschaeftspartnerbezeichnung": {
+        "description": "Bezeichnung eines Geschäftspartners unter dem Partner liegen.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "example": "Heinz Zuversicht LD ldw."
+      },
+      "GeschaeftspartnerId": {
+        "description": "Id eines Geschäftspartners unter dem Partner liegen.",
+        "type": "string",
+        "format": "uuid",
+        "example": "8f69b58d-2c0d-4398-bc72-9bd226e0bb22"
+      },
+      "Geschaeftspartnernummer": {
+        "description": "Nummer eines Geschäftspartners unter dem Partner liegen.",
+        "type": "integer",
+        "format": "int64",
+        "example": 1
+      },
+      "Geschaeftstaetigkeit": {
+        "description": "Konkretisiert bspw. die wirtschaftlichen Aktivitäten eines Betriebs. \nDiese Informationen sind zum Partner hinterlegt und werden häufig zur Identifikation der dazugehörigen Firma dargestellt.\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 25,
+        "example": "Photovoltaik"
+      },
+      "GlaeubigerId": {
+        "description": "GläubigerId einer Firma.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 35,
+        "example": "DE98ZZZ09999999999"
+      },
+      "Iban": {
+        "description": "Iban einer Kontoverbindung zum Partner/zu einer Firma.",
+        "type": "string",
+        "example": "DE02120300000000202051"
+      },
+      "KommunikationId": {
+        "description": "Id einer Kommunikation.",
+        "type": "string",
+        "format": "uuid",
+        "example": "8f69b58d-2c0d-4398-bc72-9bd226e0bb33"
+      },
+      "Kommunikationsgeschaeftsfuehrung": {
+        "description": "true = Kommunikationsmittel der Geschäftsführung des Partners/der Firma, kann je Medium einmal vorhanden sein.\n",
+        "type": "boolean"
+      },
+      "Kommunikationsinhalt": {
+        "description": "Zum Beispiel eine Telefonnummer oder E-Mail-Adresse zur Kommunikation, abhängig vom gewählten Kommunikationsmedium.\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "example": "04262 3040"
+      },
+      "Kommunikationsstandard": {
+        "description": "true = es handelt sich hierbei um das Standardkommunikationsmittel, kann je Medium einmal vorhanden sein.\n",
+        "type": "boolean"
+      },
+      "Kontoinhaber": {
+        "description": "Inhaber eines Kontos.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 35,
+        "example": "Heinz Zuversicht"
+      },
+      "Land": {
+        "description": "Angabe des Landes.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 30,
+        "example": "Deutschland"
+      },
+      "LeitwegIdNummer": {
+        "description": "Dient dazu bei der Übertragung elektronischer Rechnungen den Rechnungsempfänger zu identifizieren und Rechnungen an diesen zu adressieren.\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 46,
+        "example": "04011000-1234512345-06"
+      },
+      "LetzteAenderung": {
+        "description": "Zeitpunkt der letzten Änderung zum Partner.",
+        "type": "string",
+        "format": "date-time",
+        "example": "2020-09-15T13:54:01.396000"
+      },
+      "Nachname": {
+        "description": "Nachname eines Partners.\nNur vorhanden wenn es sich um die Partnerart Person handelt.\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 30,
+        "example": "Mustermann"
+      },
+      "Namenszusatz": {
+        "description": "Kann nur dann gefüllt sein, wenn die PartnerArt Person ist.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 30,
+        "example": "Junior"
+      },
+      "Organisationsnummer": {
+        "description": "Organisationsnummer der Buchstelle/Organisation. Wird zum Mandanten benötigt.",
+        "type": "integer",
+        "format": "int64",
+        "example": 200
+      },
+      "Ort": {
+        "description": "Ort der Adresse des Partners.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 30,
+        "example": "Visselhövede"
+      },
+      "Ortsteil": {
+        "description": "Ortsteil der Adresse des Partners.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 30,
+        "example": "Prenzlauer Berg"
+      },
+      "PartnerBis": {
+        "description": "Datum bis zu dem ein Partner existiert.",
+        "type": "string",
+        "format": "date",
+        "example": "2022-08-14"
+      },
+      "Partnergruppenbezeichnung": {
+        "description": "Bezeichnung der Partnergruppe.",
+        "type": "string",
+        "example": "Standardpartnergruppe"
+      },
+      "PartnergruppeId": {
+        "description": "Id einer Partnergruppe.",
+        "type": "string",
+        "format": "uuid",
+        "example": "8f69b58d-2c0d-4398-bc72-9bd226e0bb44"
+      },
+      "Partnergruppennummer": {
+        "description": "Nummer einer vorhandenen Partnergruppe aus ADNOVA+.",
+        "type": "integer",
+        "format": "int64",
+        "example": 1
+      },
+      "PartnerId": {
+        "description": "ID des Partners.",
+        "type": "string",
+        "format": "uuid",
+        "example": "8f69b58d-2c0d-4398-bc72-9bd226e0bb16"
+      },
+      "Partnernummer": {
+        "description": "Nummer des ADNOVA+ Partners.",
+        "type": "integer",
+        "format": "int64",
+        "example": 1
+      },
+      "PartnerSeit": {
+        "description": "Datum seit dem ein Partner existiert.",
+        "type": "string",
+        "format": "date",
+        "example": "2017-08-14"
+      },
+      "Personenkontonummer": {
+        "description": "Kontonummer des Personenkontos eines Partners.",
+        "type": "integer",
+        "minLength": 5,
+        "maxLength": 8,
+        "example": 11110019
+      },
+      "Postfach": {
+        "description": "Postfach der Adresse des Partners.\nNur bei Adressart Postfachadresse notwendig.\nBsp.: 12 45 68\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10
+      },
+      "Postleitzahl": {
+        "description": "Postleitzahl der Adresse des Partners.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 6,
+        "example": 27374
+      },
+      "SepaLastschrift": {
+        "description": "Gibt an ob für das Finanzamt Sepa Lastschrift aktiviert ist.",
+        "type": "boolean"
+      },
+      "SteuerIdNummer": {
+        "description": "Kann nur dann gefüllt sein, wenn die PartnerArt Person ist.",
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1,
+        "maximum": 99999999999,
+        "example": 81842708259
+      },
+      "Steuernummer": {
+        "description": "Steuernummer einer Firma",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 13,
+        "example": "40/987/65432"
+      },
+      "Stichwortbezeichnung": {
+        "description": "Bezeichnung des Stichworts",
+        "type": "string",
+        "example": "Maschinenring"
+      },
+      "Strasse": {
+        "description": "Strasse der Adresse des Partners.\nNur bei Adressart Strassenadresse notwendig.\n",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40,
+        "example": "Wedekindstraße 9-11"
+      },
+      "Titel": {
+        "description": "Kann nur dann gefüllt sein, wenn die PartnerArt Person ist.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 20,
+        "example": "Dr."
+      },
+      "UmsatzsteuerIdNummer": {
+        "description": "UmsatzsteuerIdNummer des Partners.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 14,
+        "example": "DE123456789"
+      },
+      "Veranlagungszeitraum": {
+        "description": "Veranlagungszeitraum des Zusatzfeldwertes, nur bei Zusatzfelder mit VZ-Bezug vorhanden.",
+        "type": "integer",
+        "format": "int32",
+        "minimum": 1900,
+        "maximum": 2099,
+        "example": 2020
+      },
+      "Vorname": {
+        "description": "Vorname des Partners. Nur bei Partnerart Person.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 30,
+        "example": "Max"
+      },
+      "Warnungsnachricht": {
+        "description": "Allgemeine Informationen zu Warnungen.",
+        "type": "string",
+        "example": "Es konnten nicht alle Felder übernommen werden."
+      },
+      "Wert": {
+        "description": "Wert des Zusatzfeldes.",
+        "type": "string",
+        "example": "12 ha"
+      },
+      "WirtschaftsIdNummer": {
+        "description": "Kann nur dann gefüllt sein, wenn die PartnerArt Unternehmen ist.",
+        "type": "string",
+        "minLength": 11,
+        "maxLength": 11,
+        "example": "DE123456789"
+      },
+      "Zusatzfeldbezeichnung": {
+        "description": "Bezeichnung des Zusatzfeldes.",
+        "type": "string",
+        "example": "Verpachtete Fläche"
+      },
+      "Zusatzfeldnummer": {
+        "description": "Nummer des Zusatzfeldes.",
+        "type": "integer",
+        "format": "int64",
+        "example": 120
+      },
+      "Adressart": {
+        "description": "Gibt an um was für eine Adresse es sich handelt.\nJe nach AdressArt sind andere Angaben bei der Anlage notwendig.\n",
+        "type": "string",
+        "enum": [
+          "StrassenAdresse",
+          "PostfachAdresse",
+          "GrosskundenAdresse"
+        ]
+      },
+      "Bundesland": {
+        "description": "Bundesland. Nur bei Partnertyp Finanzamt.",
+        "type": "string",
+        "enum": [
+          "SchleswigHolstein",
+          "Hamburg",
+          "Niedersachsen",
+          "Bremen",
+          "NordrheinWestfalen",
+          "Hessen",
+          "RheinlandPfalz",
+          "BadenWuerttemberg",
+          "Bayern",
+          "Saarland",
+          "Berlin",
+          "Brandenburg",
+          "MecklenburgVorpommern",
+          "Sachsen",
+          "SachsenAnhalt",
+          "Thueringen",
+          "Individuell"
+        ]
+      },
+      "Geschaeftspartnerstatus": {
+        "description": "Status eines Geschäftspartners. Der Status ergibt sich aus den Partnern des Geschäftspartners.\n",
+        "type": "string",
+        "enum": [
+          "aktiv",
+          "inaktiv"
+        ]
+      },
+      "Kommunikationsmedium": {
+        "description": "Beschreibt um was für ein Kommunikationsmedium es sich handelt.",
+        "type": "string",
+        "enum": [
+          "email",
+          "fax",
+          "mobil",
+          "telefon",
+          "internet",
+          "sonstiges"
+        ],
+        "example": "telefon"
+      },
+      "Kommunikationsnutzung": {
+        "description": "Zusatz zum Kommunikationsmedium. Ermöglicht die Angabe wie das Medium vom Partner selbst genutzt wird.",
+        "type": "string",
+        "enum": [
+          "dienstlich",
+          "privat",
+          "sonstiges"
+        ]
+      },
+      "Kontenrahmen": {
+        "description": "Kontenrahmen zur Firma.\nSystematik der Gliederungsgrundsätze für die Ordnung des Rechnungswesens für einen bestimmten Wirtschaftszweig.\n",
+        "type": "string",
+        "enum": [
+          "KrPlusLuF",
+          "KrPlusGewerbe"
+        ]
+      },
+      "Kontoart": {
+        "description": "Die Art des Kontos zu einem Partner.",
+        "type": "string",
+        "enum": [
+          "DebitorPersonenKonto",
+          "DebitorDiversesKonto",
+          "KreditorPersonenKonto",
+          "KreditorDiversesKonto"
+        ]
+      },
+      "Partnerstatus": {
+        "description": "Status eines Partners.",
+        "type": "string",
+        "enum": [
+          "aktiv",
+          "inaktiv"
+        ]
+      },
+      "Partnertyp": {
+        "description": "Partnertyp des Partners.\nÜber diese Schnittstelle lassen sich nur Mandant, Kunde und Lieferant anlegen.\n",
+        "type": "string",
+        "enum": [
+          "Bank",
+          "Finanzamt",
+          "Kunde",
+          "Lieferant",
+          "Mandant",
+          "Mitglied",
+          "SonstigerPartner"
+        ]
+      },
+      "Rechtsform": {
+        "description": "Gibt an welche Rechtsform ein Partner hat.",
+        "type": "string",
+        "enum": [
+          "einzelunternehmen",
+          "gbr",
+          "ohg",
+          "kg",
+          "sonstigePersonenGesellschaft",
+          "gmbhUndCoKg",
+          "eg",
+          "gmbh",
+          "eingetragenerVerein",
+          "sonstigeKapitalGesellschaft"
+        ]
+      },
+      "Veranlagung": {
+        "description": "Veranlagung des Partners.",
+        "type": "string",
+        "enum": [
+          "Kalenderjahr",
+          "AbweichendesWirtschaftsjahr"
+        ]
+      }
+    }
+  }
+}
