@@ -17,6 +17,10 @@
     {
       "url": "https://api-dev.adnova.de/fnktnext/partner-service",
       "description": "Umgebungen Entwicklung (Testdaten) nur über VPN erreichbar."
+    },
+    {
+      "url": "http://localhost:8080",
+      "description": "Umgebung Lokal/Entwicklung (Testdaten)."
     }
   ],
   "tags": [
@@ -67,6 +71,11 @@
             "service-to-service-oauth": [
               "import:partner:manage"
             ]
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BenutzerId"
           }
         ],
         "requestBody": {
@@ -168,6 +177,14 @@
             ]
           }
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BenutzerId"
+          },
+          {
+            "$ref": "#/components/parameters/Betriebsnummer"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -253,6 +270,11 @@
       }
     },
     "/api/v1/benutzer/{benutzerId}/partner/opv/lieferant": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/BenutzerId"
+        }
+      ],
       "post": {
         "summary": "Import eines Lieferanten für die Offene Posten Verwaltung",
         "tags": [
@@ -366,6 +388,14 @@
             ]
           }
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BenutzerId"
+          },
+          {
+            "$ref": "#/components/parameters/Betriebsnummer"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -465,6 +495,11 @@
             ]
           }
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PartnerFilter"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Abfrage von Partnern erfolgreich.",
@@ -537,6 +572,11 @@
             ]
           }
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PartnerFilter"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Abfrage von Partnern erfolgreich.",
@@ -607,6 +647,11 @@
             "user-to-service-oauth": [
               "import:partner:read"
             ]
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PartnerId"
           }
         ],
         "responses": {
@@ -785,6 +830,11 @@
             "user-to-service-oauth": [
               "import:partner:write"
             ]
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PartnerId"
           }
         ],
         "requestBody": {
@@ -1023,6 +1073,11 @@
             ]
           }
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FirmaIdPath"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Abfrage einer Firma erfolgreich.",
@@ -1098,6 +1153,11 @@
             "user-to-service-oauth": [
               "firma:write"
             ]
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FirmaIdPath"
           }
         ],
         "requestBody": {
@@ -1262,6 +1322,11 @@
             "user-to-service-oauth": [
               "import:partner:read"
             ]
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FirmaId"
           }
         ],
         "responses": {
@@ -1491,6 +1556,64 @@
               "firma:write": "Aktualisieren von Firmen über externe Clients, Authentifizierung über einen Benutzer."
             }
           }
+        }
+      }
+    },
+    "parameters": {
+      "BenutzerId": {
+        "name": "benutzerId",
+        "description": "Id des Benutzers, der die Aktion durchführt.",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "8f69b58d-2c0d-4398-bc72-9bd226e0bb16"
+        }
+      },
+      "Betriebsnummer": {
+        "name": "betriebsnummer",
+        "description": "Betriebsnummer einer Firma bzw. eines Mandanten.\nWird benötigt, wenn für einen Mandanten ein Kunde/Lieferant angelegt werden soll.\n",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/Betriebsnummer"
+        }
+      },
+      "PartnerId": {
+        "name": "partnerId",
+        "description": "Id des Partners.",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/PartnerId"
+        }
+      },
+      "PartnerFilter": {
+        "name": "partnerFilter",
+        "description": "Ermöglicht die Filterung von Partnern nach bestimmten Kriterien.",
+        "in": "query",
+        "schema": {
+          "$ref": "#/components/schemas/PartnerFilter"
+        },
+        "explode": true
+      },
+      "FirmaId": {
+        "name": "firmaId",
+        "description": "Identifikation einer Firma.",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "$ref": "#/components/schemas/FirmaId"
+        }
+      },
+      "FirmaIdPath": {
+        "name": "firmaId",
+        "description": "Identifikation einer Firma.",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/FirmaId"
         }
       }
     },
@@ -2782,7 +2905,7 @@
         "description": "Zeitpunkt der letzten Änderung zum Partner.",
         "type": "string",
         "format": "date-time",
-        "example": "2020-09-15T13:54:01.396000"
+        "example": "2020-09-15T13:54:01.396Z"
       },
       "Nachname": {
         "description": "Nachname eines Partners.\nNur vorhanden wenn es sich um die Partnerart Person handelt.\n",
@@ -2822,7 +2945,7 @@
         "description": "Datum bis zu dem ein Partner existiert.",
         "type": "string",
         "format": "date",
-        "example": "2022-08-14"
+        "example": "2022-08-14T00:00:00.000Z"
       },
       "Partnergruppenbezeichnung": {
         "description": "Bezeichnung der Partnergruppe.",
@@ -2857,7 +2980,7 @@
         "description": "Datum seit dem ein Partner existiert.",
         "type": "string",
         "format": "date",
-        "example": "2017-08-14"
+        "example": "2017-08-14T00:00:00.000Z"
       },
       "Personenkontonummer": {
         "description": "Kontonummer des Personenkontos eines Partners.",
