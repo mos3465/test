@@ -989,52 +989,27 @@
             "name": "inhaberPageable",
             "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Inhabern.<br>\n",
             "schema": {
-              "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Inhabern an.<br>\n",
-              "allOf": [
-                {
-                  "description": "Basisobjekt für OffSet und Limit.<br>\n",
-                  "type": "object",
-                  "properties": {
-                    "offset": {
-                      "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                      "type": "integer",
-                      "format": "int64",
-                      "default": 0,
-                      "minimum": 0,
-                      "example": 100
-                    },
-                    "limit": {
-                      "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                      "type": "integer",
-                      "format": "int32",
-                      "default": 20,
-                      "minimum": 1,
-                      "maximum": 100,
-                      "example": 15
-                    }
-                  }
+              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
+              "type": "object",
+              "properties": {
+                "offset": {
+                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
+                  "type": "integer",
+                  "format": "int64",
+                  "default": 0,
+                  "minimum": 0,
+                  "example": 100
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "sorting": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "BEZEICHNUNGASC",
-                          "BEZEICHNUNGDESC",
-                          "NUMMERASC",
-                          "NUMMERDESC"
-                        ]
-                      },
-                      "default": [
-                        "NUMMERASC"
-                      ]
-                    }
-                  }
+                "limit": {
+                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
+                  "type": "integer",
+                  "format": "int32",
+                  "default": 20,
+                  "minimum": 1,
+                  "maximum": 100,
+                  "example": 15
                 }
-              ]
+              }
             },
             "explode": true
           }
@@ -1536,86 +1511,27 @@
             "name": "belegPageable",
             "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Belegen.<br>\n",
             "schema": {
-              "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Belegen an.<br>\n",
-              "allOf": [
-                {
-                  "description": "Basisobjekt für OffSet und Limit.<br>\n",
-                  "type": "object",
-                  "properties": {
-                    "offset": {
-                      "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                      "type": "integer",
-                      "format": "int64",
-                      "default": 0,
-                      "minimum": 0,
-                      "example": 100
-                    },
-                    "limit": {
-                      "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                      "type": "integer",
-                      "format": "int32",
-                      "default": 20,
-                      "minimum": 1,
-                      "maximum": 100,
-                      "example": 15
-                    }
-                  }
+              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
+              "type": "object",
+              "properties": {
+                "offset": {
+                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
+                  "type": "integer",
+                  "format": "int64",
+                  "default": 0,
+                  "minimum": 0,
+                  "example": 100
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "sorting": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "ERSTELLTASC",
-                          "ERSTELLTDESC",
-                          "GEAENDERTASC",
-                          "GEAENDERTDESC",
-                          "DATUMASC",
-                          "DATUMDESC",
-                          "JAHRASC",
-                          "JAHRDESC",
-                          "NUMMERASC",
-                          "NUMMERDESC",
-                          "DATEIGROESSEASC",
-                          "DATEIGROESSEDESC",
-                          "BETRAGASC",
-                          "BETRAGDESC",
-                          "ZAHLUNGSBETRAGASC",
-                          "ZAHLUNGSBETRAGDESC",
-                          "VORGANGSARTASC",
-                          "VORGANGSARTDESC",
-                          "PARTNERBEZEICHNUNGASC",
-                          "PARTNERBEZEICHNUNGDESC",
-                          "ERLAEUTERUNGASC",
-                          "ERLAEUTERUNGDESC",
-                          "IBANASC",
-                          "IBANDESC",
-                          "VERWENDUNGSZWECKASC",
-                          "VERWENDUNGSZWECKDESC",
-                          "FAELLIGKEITSDATUMASC",
-                          "FAELLIGKEITSDATUMDESC",
-                          "DAUERBELEGASC",
-                          "DAUERBELEGDESC",
-                          "UPLOADBUCHSTELLEASC",
-                          "UPLOADBUCHSTELLEDESC",
-                          "BELEGBUCHASC",
-                          "BELEGBUCHDESC",
-                          "STATUSASC",
-                          "STATUSDESC",
-                          "KOMMENTARASC",
-                          "KOMMENTARDESC"
-                        ]
-                      },
-                      "default": [
-                        "ERSTELLTDESC"
-                      ]
-                    }
-                  }
+                "limit": {
+                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
+                  "type": "integer",
+                  "format": "int32",
+                  "default": 20,
+                  "minimum": 1,
+                  "maximum": 100,
+                  "example": 15
                 }
-              ]
+              }
             },
             "explode": true
           }
@@ -4993,50 +4909,27 @@
             "name": "erlaeuterungPageable",
             "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Erläuterungen.<br>\n",
             "schema": {
-              "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Erläuterungen an.<br>\n",
-              "allOf": [
-                {
-                  "description": "Basisobjekt für OffSet und Limit.<br>\n",
-                  "type": "object",
-                  "properties": {
-                    "offset": {
-                      "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                      "type": "integer",
-                      "format": "int64",
-                      "default": 0,
-                      "minimum": 0,
-                      "example": 100
-                    },
-                    "limit": {
-                      "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                      "type": "integer",
-                      "format": "int32",
-                      "default": 20,
-                      "minimum": 1,
-                      "maximum": 100,
-                      "example": 15
-                    }
-                  }
+              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
+              "type": "object",
+              "properties": {
+                "offset": {
+                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
+                  "type": "integer",
+                  "format": "int64",
+                  "default": 0,
+                  "minimum": 0,
+                  "example": 100
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "sorting": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "BEZEICHNUNGASC",
-                          "BEZEICHNUNGDESC"
-                        ]
-                      },
-                      "default": [
-                        "BEZEICHNUNGASC"
-                      ]
-                    }
-                  }
+                "limit": {
+                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
+                  "type": "integer",
+                  "format": "int32",
+                  "default": 20,
+                  "minimum": 1,
+                  "maximum": 100,
+                  "example": 15
                 }
-              ]
+              }
             },
             "explode": true
           }
@@ -5500,50 +5393,27 @@
             "name": "freitextPartnerPageable",
             "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von FreitextPartner.<br>\n",
             "schema": {
-              "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von FreitextPartnern an.<br>\n",
-              "allOf": [
-                {
-                  "description": "Basisobjekt für OffSet und Limit.<br>\n",
-                  "type": "object",
-                  "properties": {
-                    "offset": {
-                      "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                      "type": "integer",
-                      "format": "int64",
-                      "default": 0,
-                      "minimum": 0,
-                      "example": 100
-                    },
-                    "limit": {
-                      "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                      "type": "integer",
-                      "format": "int32",
-                      "default": 20,
-                      "minimum": 1,
-                      "maximum": 100,
-                      "example": 15
-                    }
-                  }
+              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
+              "type": "object",
+              "properties": {
+                "offset": {
+                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
+                  "type": "integer",
+                  "format": "int64",
+                  "default": 0,
+                  "minimum": 0,
+                  "example": 100
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "sorting": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "BEZEICHNUNGASC",
-                          "BEZEICHNUNGDESC"
-                        ]
-                      },
-                      "default": [
-                        "BEZEICHNUNGASC"
-                      ]
-                    }
-                  }
+                "limit": {
+                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
+                  "type": "integer",
+                  "format": "int32",
+                  "default": 20,
+                  "minimum": 1,
+                  "maximum": 100,
+                  "example": 15
                 }
-              ]
+              }
             }
           }
         ],
@@ -6032,50 +5902,27 @@
             "name": "labelPageable",
             "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Labeln.<br>\n",
             "schema": {
-              "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Labeln an.<br>\n",
-              "allOf": [
-                {
-                  "description": "Basisobjekt für OffSet und Limit.<br>\n",
-                  "type": "object",
-                  "properties": {
-                    "offset": {
-                      "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                      "type": "integer",
-                      "format": "int64",
-                      "default": 0,
-                      "minimum": 0,
-                      "example": 100
-                    },
-                    "limit": {
-                      "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                      "type": "integer",
-                      "format": "int32",
-                      "default": 20,
-                      "minimum": 1,
-                      "maximum": 100,
-                      "example": 15
-                    }
-                  }
+              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
+              "type": "object",
+              "properties": {
+                "offset": {
+                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
+                  "type": "integer",
+                  "format": "int64",
+                  "default": 0,
+                  "minimum": 0,
+                  "example": 100
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "sorting": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "BEZEICHNUNGASC",
-                          "BEZEICHNUNGDESC"
-                        ]
-                      },
-                      "default": [
-                        "BEZEICHNUNGASC"
-                      ]
-                    }
-                  }
+                "limit": {
+                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
+                  "type": "integer",
+                  "format": "int32",
+                  "default": 20,
+                  "minimum": 1,
+                  "maximum": 100,
+                  "example": 15
                 }
-              ]
+              }
             }
           }
         ],
@@ -6659,50 +6506,27 @@
             "name": "ordnerPageable",
             "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Ordnern.<br>\n",
             "schema": {
-              "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Ordnern an.<br>\n",
-              "allOf": [
-                {
-                  "description": "Basisobjekt für OffSet und Limit.<br>\n",
-                  "type": "object",
-                  "properties": {
-                    "offset": {
-                      "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                      "type": "integer",
-                      "format": "int64",
-                      "default": 0,
-                      "minimum": 0,
-                      "example": 100
-                    },
-                    "limit": {
-                      "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                      "type": "integer",
-                      "format": "int32",
-                      "default": 20,
-                      "minimum": 1,
-                      "maximum": 100,
-                      "example": 15
-                    }
-                  }
+              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
+              "type": "object",
+              "properties": {
+                "offset": {
+                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
+                  "type": "integer",
+                  "format": "int64",
+                  "default": 0,
+                  "minimum": 0,
+                  "example": 100
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "sorting": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "BEZEICHNUNGASC",
-                          "BEZEICHNUNGDESC"
-                        ]
-                      },
-                      "default": [
-                        "BEZEICHNUNGASC"
-                      ]
-                    }
-                  }
+                "limit": {
+                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
+                  "type": "integer",
+                  "format": "int32",
+                  "default": 20,
+                  "minimum": 1,
+                  "maximum": 100,
+                  "example": 15
                 }
-              ]
+              }
             }
           }
         ],
@@ -7194,50 +7018,27 @@
             "name": "stichwortPageable",
             "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Stichworten.<br>\n",
             "schema": {
-              "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Stichworten an.<br>\n",
-              "allOf": [
-                {
-                  "description": "Basisobjekt für OffSet und Limit.<br>\n",
-                  "type": "object",
-                  "properties": {
-                    "offset": {
-                      "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                      "type": "integer",
-                      "format": "int64",
-                      "default": 0,
-                      "minimum": 0,
-                      "example": 100
-                    },
-                    "limit": {
-                      "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                      "type": "integer",
-                      "format": "int32",
-                      "default": 20,
-                      "minimum": 1,
-                      "maximum": 100,
-                      "example": 15
-                    }
-                  }
+              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
+              "type": "object",
+              "properties": {
+                "offset": {
+                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
+                  "type": "integer",
+                  "format": "int64",
+                  "default": 0,
+                  "minimum": 0,
+                  "example": 100
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "sorting": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "BEZEICHNUNGASC",
-                          "BEZEICHNUNGDESC"
-                        ]
-                      },
-                      "default": [
-                        "BEZEICHNUNGASC"
-                      ]
-                    }
-                  }
+                "limit": {
+                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
+                  "type": "integer",
+                  "format": "int32",
+                  "default": 20,
+                  "minimum": 1,
+                  "maximum": 100,
+                  "example": 15
                 }
-              ]
+              }
             },
             "explode": true
           }
@@ -7520,52 +7321,27 @@
             "name": "vorgangsartPageable",
             "description": "Objekt für das OffSet, Limit und die Sortierung beim Laden von Vorgangsarten.<br>\n",
             "schema": {
-              "description": "Gibt das OffSet, Limit und die Sortierung für das Abrufen von Vorgangsarten an.<br>\n",
-              "allOf": [
-                {
-                  "description": "Basisobjekt für OffSet und Limit.<br>\n",
-                  "type": "object",
-                  "properties": {
-                    "offset": {
-                      "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
-                      "type": "integer",
-                      "format": "int64",
-                      "default": 0,
-                      "minimum": 0,
-                      "example": 100
-                    },
-                    "limit": {
-                      "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
-                      "type": "integer",
-                      "format": "int32",
-                      "default": 20,
-                      "minimum": 1,
-                      "maximum": 100,
-                      "example": 15
-                    }
-                  }
+              "description": "Basisobjekt für OffSet und Limit.<br>\n [OpenMetadata: allOf vereinfacht]",
+              "type": "object",
+              "properties": {
+                "offset": {
+                  "description": "Wird bei GET-Funktionen genutzt, um anzugeben, wie viele Werte übersprungen werden sollen.",
+                  "type": "integer",
+                  "format": "int64",
+                  "default": 0,
+                  "minimum": 0,
+                  "example": 100
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "sorting": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "NUMMERASC",
-                          "NUMMERDESC",
-                          "BEZEICHNUNGASC",
-                          "BEZEICHNUNGDESC"
-                        ]
-                      },
-                      "default": [
-                        "NUMMERASC"
-                      ]
-                    }
-                  }
+                "limit": {
+                  "description": "Wird bei GET-Funktionen genutzt, um die Anzahl der zurückgegebenen Werte zu begrenzen",
+                  "type": "integer",
+                  "format": "int32",
+                  "default": 20,
+                  "minimum": 1,
+                  "maximum": 100,
+                  "example": 15
                 }
-              ]
+              }
             }
           }
         ],
