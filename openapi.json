@@ -3453,7 +3453,7 @@
               "beon:beleg:delete": "Loeschen Scope fuer Belege",
               "beon:inhaber:stammdaten:read": "Lese Scope auf Stammdaten",
               "beon:inhaber:stammdaten:manage": "Anlage",
-              "Aenderung und Delete Scope auf Stammdaten": null
+              "Aenderung und Delete Scope auf Stammdaten": "Aenderung und Delete Scope auf Stammdaten"
             }
           }
         }
@@ -5881,13 +5881,13 @@
         "description": "Zeitpunkt zu den ein Datensatz erstellt wurde.<br>\n",
         "type": "string",
         "format": "date-time",
-        "example": "2020-08-12T09:12:17.074"
+        "example": "2020-08-12T09:12:17.074000"
       },
       "ZeitpunktAenderung": {
         "description": "Zeitpunkt zu den ein Datensatz zuletzt geändert wurde.<br>\n",
         "type": "string",
         "format": "date-time",
-        "example": "2020-09-15T13:54:01.396"
+        "example": "2020-09-15T13:54:01.396000"
       }
     }
   }
